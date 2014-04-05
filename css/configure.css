@@ -1,0 +1,3 @@
+#content.bootstrap form .tab-pane:first-child .panel {
+	border-top-left-radius: 0;
+}
