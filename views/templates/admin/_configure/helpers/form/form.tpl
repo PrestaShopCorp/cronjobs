@@ -144,6 +144,7 @@
 														value="{if isset($input.string_format) && $input.string_format}{$value_text|string_format:$input.string_format|escape:'html':'UTF-8'}{else}{$value_text|escape:'html':'UTF-8'}{/if}"
 														onkeyup="if (isArrowKey(event)) return ;updateFriendlyURL();"
 														{if isset($input.size)} size="{$input.size}"{/if}
+														{if isset($input.placeholder)} placeholder="{$input.placeholder}"{/if}
 														{if isset($input.maxchar)} data-maxchar="{$input.maxchar}"{/if}
 														{if isset($input.maxlength)} maxlength="{$input.maxlength}"{/if}
 														{if isset($input.readonly) && $input.readonly} readonly="readonly"{/if}
@@ -226,6 +227,7 @@
 												value="{if isset($input.string_format) && $input.string_format}{$value_text|string_format:$input.string_format|escape:'html':'UTF-8'}{else}{$value_text|escape:'html':'UTF-8'}{/if}"
 												class="{if $input.type == 'tags'}tagify {/if}{if isset($input.class)}{$input.class}{/if}"
 												{if isset($input.size)} size="{$input.size}"{/if}
+												{if isset($input.placeholder)} placeholder="{$input.placeholder}"{/if}
 												{if isset($input.maxchar)} data-maxchar="{$input.maxchar}"{/if}
 												{if isset($input.maxlength)} maxlength="{$input.maxlength}"{/if}
 												{if isset($input.class)} class="{$input.class}"{/if}
