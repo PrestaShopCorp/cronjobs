@@ -55,6 +55,9 @@ class CronJobs extends PaymentModule
 	{
 		Configuration::updateValue('CRONJOBS_MODE', 'webservice');
 		
+		$token = Tools::encrypt(_PS_ADMIN_DIR_.time());
+		Configuration::updateValue('CRONJOBS_EXECUTION_TOKEN', $token);
+		
 		return $this->installDb() && parent::install() && $this->registerHook('backOfficeHeader');
 	}
 	
@@ -67,35 +70,23 @@ class CronJobs extends PaymentModule
 
 	public function installDb()
 	{
-		$success = Db::getInstance()->execute('
+		return Db::getInstance()->execute('
 			CREATE TABLE IF NOT EXISTS '._DB_PREFIX_.$this->name.' (
-			`id_cronjob` int(10) NOT NULL AUTO_INCREMENT, 
-			`task` varchar(254) NOT NULL,
+			`id_cronjob` INTEGER(10) NOT NULL AUTO_INCREMENT, 
+			`task` VARCHAR(254) NOT NULL,
 			`hour` INTEGER NOT NULL,
 			`day` INTEGER NOT NULL,
 			`month` INTEGER NOT NULL,
 			`day_of_week` INTEGER NOT NULL,
+			`last_execution` VARCHAR(32) DEFAULT \'0\',
 			PRIMARY KEY(`id_cronjob`))
 			ENGINE='._MYSQL_ENGINE_.' default CHARSET=utf8'
 		);
-		
-		$success &= Db::getInstance()->execute('
-			CREATE TABLE IF NOT EXISTS '._DB_PREFIX_.$this->name.'_shop (
-			`id_cronjob` int(10) NOT NULL AUTO_INCREMENT, 
-			`id_shop` int(10) NOT NULL,
-			PRIMARY KEY(`id_cronjob`, `id_shop`))
-			ENGINE='._MYSQL_ENGINE_.' default CHARSET=utf8'
-		);
-		
-		return $success;
 	}
 
 	public function uninstallDb()
 	{
-		$success = Db::getInstance()->execute('DROP TABLE IF EXISTS '._DB_PREFIX_.$this->name);
-		$success &= Db::getInstance()->execute('DROP TABLE IF EXISTS '._DB_PREFIX_.$this->name.'_shop');
-		
-		return $success;
+		return Db::getInstance()->execute('DROP TABLE IF EXISTS '._DB_PREFIX_.$this->name);
 	}
 	
 	public function hookBackOfficeHeader()
@@ -179,7 +170,7 @@ class CronJobs extends PaymentModule
 		$helper->no_link = true;
 		$helper->shopLinkType = '';
 		$helper->identifier = 'id_cronjob';
-		$helper->actions = array('edit', 'delete');
+		$helper->actions = array('delete');
 		
 		$helper->toolbar_btn['new'] = array(
 			'href' => $this->context->link->getAdminLink('AdminModules', false)
@@ -192,9 +183,7 @@ class CronJobs extends PaymentModule
 		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
 		   .'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 		
-		$id_shop = Shop::isFeatureActive() ? $this->context->shop->id : false;
-		
-		return $helper->generateList($this->getListValues($id_shop), $this->getList());
+		return $helper->generateList($this->getListValues(), $this->getList());
 	}
 
 	protected function _postProcessConfiguration()
@@ -202,8 +191,28 @@ class CronJobs extends PaymentModule
 		$values = array('advanced', 'automatic', 'webservice');
 		
 		if (Tools::isSubmit('cron_mode') == true)
-			if (in_array(Tools::getValue('cron_mode'), $values) == true)
-				Configuration::updateValue('CRONJOBS_MODE', Tools::getValue('cron_mode'));
+		{
+			$cron_mode = Tools::getValue('cron_mode');
+			
+			if (in_array($cron_mode, $values) == true)
+			{
+				Configuration::updateValue('CRONJOBS_MODE', $cron_mode);
+				
+				switch ($cron_mode)
+				{
+					case 'advanced':
+						return $this->unregisterHook('header');
+					case 'automatic':
+						return $this->registerHook('header');
+					case 'webservice':
+						$this->unregisterHook('header');
+						$this->registerOnWebservice();
+						return;
+					default:
+						break;
+				}
+			}
+		}
 	}
 
 	protected function _postProcessNewJob()
@@ -217,8 +226,8 @@ class CronJobs extends PaymentModule
 			$day_of_week = (int)Tools::getValue('day_of_week');
 			
 			$query = 'INSERT INTO '._DB_PREFIX_.$this->name.'
-				(`task`, `hour`, `day`, `month`, `day_of_week`)
-				VALUES (\''.$task.'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\')';
+				(`task`, `hour`, `day`, `month`, `day_of_week`, `last_execution`)
+				VALUES (\''.$task.'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\', \''.null.'\')';
 			
 			return Db::getInstance()->execute($query);
 		}
@@ -256,6 +265,11 @@ class CronJobs extends PaymentModule
 		return false;
 	}
 	
+	protected function registerOnWebservice()
+	{
+		d('registerOnWebservice');
+	}
+	
 	protected function deleteCronJob($id_cronjob)
 	{
 		Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.$this->name.'
@@ -271,7 +285,7 @@ class CronJobs extends PaymentModule
 		$form = array(
 			'form' => array(
 				'legend' => array(
-					'title' => $this->l('Mode'),
+					'title' => $this->l('Settings'),
 					'icon' => 'icon-cog',
 				),
 				'input' => array(
@@ -312,6 +326,8 @@ class CronJobs extends PaymentModule
 			$form['form']['input'][] = array(
 				'type' => 'free',
 				'name' => 'advanced_help',
+				'col' => 12,
+				'offset' => 0,
 			);
 		}
 		
@@ -320,12 +336,16 @@ class CronJobs extends PaymentModule
 	
 	protected function getFormValues()
 	{
+		$token = Configuration::get('CRONJOBS_EXECUTION_TOKEN');
+		$client_path = $this->local_path.'classes/client.php token='.$token;
+
 		return array(
 			'cron_mode' => Configuration::get('CRONJOBS_MODE'),
 			'advanced_help' =>
-				'<p class="alert alert-info">To enable execute your cron jobs you should insert the following command in your "crontab" utility.<br />
-					<code>Test</code>
-				</p>'
+				'<div class="alert alert-info">
+					<p>'.$this->l('To execute your cron jobs please insert the following command in your crontab manager').':</p>
+					<br /><code>0 * * * * php '.$client_path.'</code>
+				</div>'
 		);
 	}
 	
@@ -393,7 +413,7 @@ class CronJobs extends PaymentModule
 	protected function getNewJobFormValues()
 	{
 		return array(
-			'task' => Tools::getShopDomain(true, true).__PS_BASE_URI__.basename(_PS_ADMIN_DIR_).'/cron_currency_rates.php?secure_key='.md5(_COOKIE_KEY_.Configuration::get('PS_SHOP_NAME')),
+			'task' => null,
 			'hour' => -1,
 			'day' => -1,
 			'month' => -1,
@@ -476,31 +496,18 @@ class CronJobs extends PaymentModule
 				'title' => $this->l('Day of week'),
 				'type' => 'text', 'search' => false, 'orderby' => false,
 			),
+			'last_execution' => array(
+				'title' => $this->l('Last execution'),
+				'type' => 'text', 'search' => false, 'orderby' => false,
+			),
 		);
-
-		if (Shop::isFeatureActive())
-		{
-			$fields_list['id_shop'] = array(
-				'title' => $this->l('# Shop'),
-				'align' => 'center',
-				'width' => 25,
-				'type' => 'int',
-				'search' => false,
-				'orderby' => false,
-			);
-		}
 		
 		return $fields_list;
 	}
 
-	protected function getListValues($id_shop = null)
+	protected function getListValues()
 	{
-		$query = 'SELECT c.*
-			FROM `'._DB_PREFIX_.$this->name.'` c
-			'.($id_shop ? 'LEFT JOIN `'._DB_PREFIX_.$this->name.'_shop` cs ON (cs.`id_cronjob` = c.`id_cronjob`)
-			WHERE cs.`id_shop` = '.bqSQL((int)$id_shop) : '');
-		
-		$tasks = Db::getInstance()->executeS($query);
+		$tasks = Db::getInstance()->executeS('SELECT c.* FROM `'._DB_PREFIX_.$this->name.'` c');
 		
 		foreach ($tasks as &$task)
 		{
@@ -509,6 +516,7 @@ class CronJobs extends PaymentModule
 			$task['day'] = ($task['day'] == -1) ? $this->l('Every days') : (int)$task['day'];
 			$task['month'] = ($task['month'] == -1) ? $this->l('Every months') : $this->l(date('F', mktime(0, 0, 0, (int)$task['month'], 1)));
 			$task['day_of_week'] = ($task['day_of_week'] == -1) ? $this->l('Every week days') : $this->l(date('F', mktime(0, 0, 0, 0, (int)$task['day_of_week'])));
+			$task['last_execution'] = ($task['last_execution'] == 0) ? $this->l('Never') : $this->l(date('c', $task['last_execution']));
 		}
 		
 		return $tasks;
