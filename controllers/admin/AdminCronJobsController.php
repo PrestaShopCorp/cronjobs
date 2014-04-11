@@ -26,8 +26,14 @@
 
 class AdminCronJobsController extends ModuleAdminController
 {
-	public function __construct()
+	public function processCron()
 	{
-		Hook::exec('actionCronJob');
+		d(Hook::exec('actionCronJob'));
 	}
+	
+	public function processCallback()
+	{
+		d('test');
+	}
+	
 }
