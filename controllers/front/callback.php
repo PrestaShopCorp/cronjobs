@@ -24,50 +24,13 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-class AdminCronJobsController extends ModuleAdminController
+class CronjobsCallbackModuleFrontController extends ModuleFrontController
 {
-	public function checkAccess()
-	{
-		if (Tools::getValue('token') != Configuration::get('CRONJOBS_EXECUTION_TOKEN'))
-			return false;
 
-		return true;
-	}
-	
 	public function postProcess()
 	{
 		$this->module->sendCallback();
-		
-		$this->runModulesCrons();
-		$this->runTasksCrons();
-		
 		die;
-	}
-	
-	protected function runModulesCrons()
-	{
-		$query = 'SELECT * FROM '._DB_PREFIX_.$this->module->name.' WHERE `active` = 1 AND `id_module` IS NOT NULL';
-		$modules = Db::getInstance()->executeS($query);
-		
-		ob_start();
-		
-		foreach ($modules as &$module)
-			Hook::exec('actionCronJob', array(), $module['id_module']);
-		
-		ob_end_clean();
-	}
-	
-	protected function runTasksCrons()
-	{
-		$query = 'SELECT * FROM '._DB_PREFIX_.$this->module->name.' WHERE `task` IS NOT NULL AND `active` = 1 AND `id_module` IS NULL';
-		$tasks = Db::getInstance()->executeS($query);
-		
-		ob_start();
-
-		foreach ($tasks as &$task)
-			Tools::file_get_contents(urldecode($task['task']));
-		
-		ob_end_clean();
 	}
 	
 }
