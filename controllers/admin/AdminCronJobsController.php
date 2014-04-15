@@ -38,6 +38,9 @@ class AdminCronJobsController extends ModuleAdminController
 	{
 		$this->module->sendCallback();
 		
+		$cron = Db::getInstance()->getRow('SELECT * FROM '._DB_PREFIX_.$this->module->name.' WHERE `id_cronjob` = 1');
+		$this->shouldBeExecuted($cron);
+		
 		$this->runModulesCrons();
 		$this->runTasksCrons();
 		
@@ -47,27 +50,57 @@ class AdminCronJobsController extends ModuleAdminController
 	protected function runModulesCrons()
 	{
 		$query = 'SELECT * FROM '._DB_PREFIX_.$this->module->name.' WHERE `active` = 1 AND `id_module` IS NOT NULL';
-		$modules = Db::getInstance()->executeS($query);
+		$crons = Db::getInstance()->executeS($query);
 		
 		ob_start();
 		
-		foreach ($modules as &$module)
-			Hook::exec('actionCronJob', array(), $module['id_module']);
-		
+		foreach ($crons as &$cron)
+			if ($this->shouldBeExecuted($cron) == true)
+				Hook::exec('actionCronJob', array(), $cron['id_module']);
+				
 		ob_end_clean();
 	}
 	
 	protected function runTasksCrons()
 	{
-		$query = 'SELECT * FROM '._DB_PREFIX_.$this->module->name.' WHERE `task` IS NOT NULL AND `active` = 1 AND `id_module` IS NULL';
-		$tasks = Db::getInstance()->executeS($query);
+		$query = 'SELECT * FROM '._DB_PREFIX_.$this->module->name.' WHERE `active` = 1 AND `id_module` IS NULL';
+		$crons = Db::getInstance()->executeS($query);
 		
 		ob_start();
 
-		foreach ($tasks as &$task)
-			Tools::file_get_contents(urldecode($task['task']));
+		foreach ($crons as &$cron)
+			if ($this->shouldBeExecuted($cron) == true)
+				Tools::file_get_contents(urldecode($cron['task']));
 		
 		ob_end_clean();
+	}
+	
+	protected function shouldBeExecuted($cron)
+	{
+		extract($cron);
+		
+		$date = $orig = new DateTime();
+		$date->modify(date('F', strtotime('January +'.((($month == -1) ? date('m') : $month) - 1).' months')));
+		$date->setDate($date->format('Y'), $date->format('m'), ($day == -1) ? date('d') : $day);
+		
+		if ($day_of_week != -1)
+			$date->modify(date('l', strtotime('Sunday +'.$day_of_week.' days')));
+		else
+			$day_of_week = date('l');
+		
+		$date->setTime(($hour == -1) ? date('H') : $hour, date('i'), date('s'));
+		
+		$interval = $orig->diff($date);
+		if ($interval->format('%R') == '-')
+			$date->modify('+1 year');
+
+		return (bool)$this->validateDate($day_of_week.' '.$date->format('Y-m-d H'));
+	}
+	
+	protected function validateDate($date, $format = 'l Y-m-d H')
+	{
+		$temp = DateTime::createFromFormat($format, $date);
+		return $temp && $temp->format($format) == $date;
 	}
 	
 }

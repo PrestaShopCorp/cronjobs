@@ -35,7 +35,7 @@ class CronJobs extends PaymentModule
 	protected $_errors;
 	protected $_successes;
 	
-	public $webservice_url = 'https://cron.prestashop.com/crons/';
+	public $webservice_url = 'http://webcron.prestashop.com/crons/';
 	
 	public function __construct()
 	{
@@ -87,6 +87,7 @@ class CronJobs extends PaymentModule
 			`month` INTEGER DEFAULT \'-1\',
 			`day_of_week` INTEGER DEFAULT \'-1\',
 			`last_execution` VARCHAR(32) DEFAULT NULL,
+			`next_execution` VARCHAR(32) DEFAULT NULL,
 			`active` BOOLEAN DEFAULT FALSE,
 			PRIMARY KEY(`id_cronjob`),
 			INDEX (`id_module`))
@@ -723,45 +724,57 @@ class CronJobs extends PaymentModule
 		$modules = Hook::getHookModuleExecList('actionCronJob');
 		$tasks = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.$this->name.'`');
 		
-		foreach ($tasks as &$task)
-			foreach ($modules as $module_key => &$module)
-				if ((is_null($module) == false) && ($task['id_module'] == $module['id_module']))
-					unset($modules[$module_key]);
-		
-		foreach ($tasks as &$task)
-		{	
-			if (empty($task['task']) == true)
-			{
-				$task['id_cronjob'] = MODULES_PREFIX.$task['id_module'];
-				$task['id_module'] = MODULES_PREFIX.$task['id_module'];
-				$module_info = Db::getInstance()->getRow('SELECT `name` FROM `'._DB_PREFIX_.'module` WHERE `id_module` = \''.substr($task['id_module'], 1).'\'');
-				$task['task'] = Tools::safeOutput(Module::getModuleName($module_info['name']));
-			}
-			else
-			{
-				$task['id_cronjob'] = TASKS_PREFIX.$task['id_cronjob'];
-				$task['id_module'] = TASKS_PREFIX.$task['id_module'];
-				$task['task'] = Tools::safeOutput(urldecode($task['task']));
-			}
+		if (is_array($tasks) && count($tasks) > 0)
+		{
+			
+			if (is_array($modules) && count($modules) > 0)
+				foreach ($tasks as &$task)
+					foreach ($modules as $module_key => &$module)
+						if ((is_null($module) == false) && ($task['id_module'] == $module['id_module']))
+							unset($modules[$module_key]);
+			
+			foreach ($tasks as &$task)
+			{	
+				if (empty($task['task']) == true)
+				{
+					$task['id_cronjob'] = MODULES_PREFIX.$task['id_module'];
+					$task['id_module'] = MODULES_PREFIX.$task['id_module'];
+					$module_info = Db::getInstance()->getRow('SELECT `name` FROM `'._DB_PREFIX_.'module` WHERE `id_module` = \''.substr($task['id_module'], 1).'\'');
+					$task['task'] = Tools::safeOutput(Module::getModuleName($module_info['name']));
+				}
+				else
+				{
+					$task['id_cronjob'] = TASKS_PREFIX.$task['id_cronjob'];
+					$task['id_module'] = TASKS_PREFIX.$task['id_module'];
+					$task['task'] = Tools::safeOutput(urldecode($task['task']));
+				}
 				
-			$task['hour'] = ($task['hour'] == -1) ? $this->l('Every hours') : date('H:i', mktime((int)$task['hour'], 0, 0, 0, 1));
-			$task['day'] = ($task['day'] == -1) ? $this->l('Every days') : (int)$task['day'];
-			$task['month'] = ($task['month'] == -1) ? $this->l('Every months') : $this->l(date('F', mktime(0, 0, 0, (int)$task['month'], 1)));
-			$task['day_of_week'] = ($task['day_of_week'] == -1) ? $this->l('Every week days') : $this->l(date('l', mktime(0, 0, 0, 0, (int)$task['day_of_week'])));
-			$task['last_execution'] = ($task['last_execution'] == 0) ? $this->l('Never') : $this->l(date('c', $task['last_execution']));
-			$task['active'] = (bool)$task['active'];
+				$task['hour'] = ($task['hour'] == -1) ? $this->l('Every hours') : date('H:i', mktime((int)$task['hour'], 0, 0, 0, 1));
+				$task['day'] = ($task['day'] == -1) ? $this->l('Every days') : (int)$task['day'];
+				$task['month'] = ($task['month'] == -1) ? $this->l('Every months') : $this->l(date('F', mktime(0, 0, 0, (int)$task['month'], 1)));
+				$task['day_of_week'] = ($task['day_of_week'] == -1) ? $this->l('Every week days') : $this->l(date('l', mktime(0, 0, 0, 0, (int)$task['day_of_week'])));
+				$task['last_execution'] = ($task['last_execution'] == 0) ? $this->l('Never') : $this->l(date('c', $task['last_execution']));
+				$task['active'] = (bool)$task['active'];
+			}
 		}
 		
-		foreach ($modules as &$module)
+		if (is_array($modules) && count($modules) > 0)
 		{
-			$module['id_cronjob'] = MODULES_PREFIX.$module['id_module'];
-			$module['task'] = Tools::safeOutput(Module::getModuleName($module['module']));
-			$module['hour'] = $this->l('Every hours');
-			$module['day'] = $this->l('Every days');
-			$module['month'] = $this->l('Every months');
-			$module['day_of_week'] = $this->l('Every week days');
-			$module['last_execution'] = $this->l('Never');
-			$module['active'] = false;
+			foreach ($modules as &$module)
+			{
+				$module['id_cronjob'] = MODULES_PREFIX.$module['id_module'];
+				$module['task'] = Tools::safeOutput(Module::getModuleName($module['module']));
+				$module['hour'] = $this->l('Every hours');
+				$module['day'] = $this->l('Every days');
+				$module['month'] = $this->l('Every months');
+				$module['day_of_week'] = $this->l('Every week days');
+				$module['last_execution'] = $this->l('Never');
+				$module['active'] = false;
+			}
+		}
+		else
+		{
+			$modules = array();
 		}
 		
 		return array_merge($tasks, $modules);
