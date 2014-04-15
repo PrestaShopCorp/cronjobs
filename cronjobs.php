@@ -324,14 +324,13 @@ class CronJobs extends PaymentModule
 
 		if ($cron_type == TASKS_PREFIX)
 		{
-			$task = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.$this->name.'` WHERE `id_cronjob` = \''.$id_cronjob.'\'');
 			$query = 'UPDATE '._DB_PREFIX_.$this->name.' SET `task` = \''.$task.'\', `hour` = \''.$hour.'\', `day` = \''.$day.'\', `month` = \''.$month.'\', `day_of_week` = \''.$day_of_week.'\' WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'';
 		}
 		elseif ($cron_type == MODULES_PREFIX)
 		{
-			$task = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.$this->name.'` WHERE `id_module` = \''.$id_cronjob.'\'');
+			$temp = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.$this->name.'` WHERE `id_module` = \''.$id_cronjob.'\'');
 			
-			if ($task == false)
+			if ($temp == false)
 				$query = 'INSERT INTO '._DB_PREFIX_.$this->name.' (`id_module`, `hour`, `day`, `month`, `day_of_week`, `last_execution`) VALUES (\''.(int)$id_cronjob.'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\', NULL)';
 			else
 				$query = 'UPDATE '._DB_PREFIX_.$this->name.' SET `hour` = \''.$hour.'\', `day` = \''.$day.'\', `month` = \''.$month.'\', `day_of_week` = \''.$day_of_week.'\' WHERE `id_module` = \''.(int)$id_cronjob.'\'';
