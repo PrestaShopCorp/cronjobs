@@ -420,9 +420,10 @@ class CronJobs extends PaymentModule
 	protected function toggleWebservice()
 	{
 		$cron_mode = Tools::getValue('cron_mode');
-		$admin_folder = str_replace(_PS_ROOT_DIR_, null, _PS_ADMIN_DIR_);
+		$admin_folder = str_replace(_PS_ROOT_DIR_.'/', null, _PS_ADMIN_DIR_);
 		$path = Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.$admin_folder;
-		$cron_url = $path.$this->context->link->getAdminLink('AdminCronJobs', false);
+		$cron_url = $path.'/'.$this->context->link->getAdminLink('AdminCronJobs', false);
+		
 		$webservice_id = Configuration::get('CRONJOBS_WEBSERVICE_ID') ? '/'.Configuration::get('CRONJOBS_WEBSERVICE_ID') : null;
 		
 		$data = array(
