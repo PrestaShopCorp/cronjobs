@@ -435,8 +435,6 @@ class CronJobs extends PaymentModule
 		$context_options = array (
 			'http' => array(
 				'method' => $webservice_id ? 'PUT' : 'POST',
-				'header' => 'Content-type: application/x-www-form-urlencoded\r\n'
-					."Content-Length: ".Tools::strlen($data)."\r\n",
 				'content' => http_build_query($data),
 			)
 		);
