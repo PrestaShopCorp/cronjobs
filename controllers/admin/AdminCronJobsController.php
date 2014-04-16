@@ -26,25 +26,28 @@
 
 class AdminCronJobsController extends ModuleAdminController
 {
-	public function checkAccess()
+	public function __construct()
 	{
 		if (Tools::getValue('token') != Configuration::get('CRONJOBS_EXECUTION_TOKEN'))
-			return false;
-
-		return true;
+			die;
+			
+		parent::__construct();
+		
+		$this->postProcess();
+		
+		die;
 	}
 	
 	public function postProcess()
 	{
 		$this->module->sendCallback();
 		
-		$cron = Db::getInstance()->getRow('SELECT * FROM '._DB_PREFIX_.$this->module->name.' WHERE `id_cronjob` = 1');
-		$this->shouldBeExecuted($cron);
+		ob_start();
 		
 		$this->runModulesCrons();
 		$this->runTasksCrons();
 		
-		die;
+		ob_end_clean();
 	}
 	
 	protected function runModulesCrons()
@@ -52,13 +55,10 @@ class AdminCronJobsController extends ModuleAdminController
 		$query = 'SELECT * FROM '._DB_PREFIX_.$this->module->name.' WHERE `active` = 1 AND `id_module` IS NOT NULL';
 		$crons = Db::getInstance()->executeS($query);
 		
-		ob_start();
-		
-		foreach ($crons as &$cron)
-			if ($this->shouldBeExecuted($cron) == true)
-				Hook::exec('actionCronJob', array(), $cron['id_module']);
-				
-		ob_end_clean();
+		if (is_array($crons) && (count($crons) > 0))
+			foreach ($crons as &$cron)
+				if ($this->shouldBeExecuted($cron) == true)
+					Hook::exec('actionCronJob', array(), $cron['id_module']);
 	}
 	
 	protected function runTasksCrons()
@@ -66,13 +66,10 @@ class AdminCronJobsController extends ModuleAdminController
 		$query = 'SELECT * FROM '._DB_PREFIX_.$this->module->name.' WHERE `active` = 1 AND `id_module` IS NULL';
 		$crons = Db::getInstance()->executeS($query);
 		
-		ob_start();
-
-		foreach ($crons as &$cron)
-			if ($this->shouldBeExecuted($cron) == true)
-				Tools::file_get_contents(urldecode($cron['task']));
-		
-		ob_end_clean();
+		if (is_array($crons) && (count($crons) > 0))
+			foreach ($crons as &$cron)
+				if ($this->shouldBeExecuted($cron) == true)
+					$result = Tools::file_get_contents(urldecode($cron['task']), false);
 	}
 	
 	protected function shouldBeExecuted($cron)
