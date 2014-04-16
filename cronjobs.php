@@ -35,7 +35,7 @@ class CronJobs extends PaymentModule
 	protected $_errors;
 	protected $_successes;
 	
-	public $webservice_url = 'http://webcron.prestashop.com/crons/';
+	public $webservice_url = 'http://webcron.prestashop.com/crons';
 	
 	public function __construct()
 	{
@@ -423,22 +423,24 @@ class CronJobs extends PaymentModule
 		$admin_folder = str_replace(_PS_ROOT_DIR_, null, _PS_ADMIN_DIR_);
 		$path = Tools::getShopDomainSsl(true, true).$admin_folder.__PS_BASE_URI__;
 		$cron_url = $path.$this->context->link->getAdminLink('AdminCronJobs', false);
-		$webservice_id = Configuration::get('CRONJOBS_WEBSERVICE_ID') ? Configuration::get('CRONJOBS_WEBSERVICE_ID') : null;
+		$webservice_id = Configuration::get('CRONJOBS_WEBSERVICE_ID') ? '/'.Configuration::get('CRONJOBS_WEBSERVICE_ID') : null;
 		
-		$data = http_build_query(array(
+		$data = array(
 			'callback' => $this->context->link->getModuleLink('cronjobs', 'callback'),
 			'cronjob' => $cron_url.'&token='.Configuration::get('CRONJOBS_EXECUTION_TOKEN'),
 			'cron_token' => Configuration::get('CRONJOBS_EXECUTION_TOKEN'),
 			'active' => ($cron_mode == 'advanced') ? false : true,
-		));
-		
-		$context_options = array (
-			'http' => array (
-				'method' => $webservice_id ? 'PUT' : 'POST',
-				'content' => $data
-			)
 		);
 		
+		$context_options = array (
+			'http' => array(
+				'method' => $webservice_id ? 'PUT' : 'POST',
+				'header' => 'Content-type: application/x-www-form-urlencoded\r\n'
+					."Content-Length: ".Tools::strlen($data)."\r\n",
+				'content' => http_build_query($data),
+			)
+		);
+
 		$context = stream_context_create($context_options);
 		$result = Tools::file_get_contents($this->webservice_url.$webservice_id, false, $context);
 		Configuration::updateValue('CRONJOBS_WEBSERVICE_ID', (int)$result);
