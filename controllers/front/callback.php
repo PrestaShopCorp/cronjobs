@@ -1,5 +1,5 @@
 <?php
-/*
+/**
 * 2007-2014 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -32,5 +32,5 @@ class CronjobsCallbackModuleFrontController extends ModuleFrontController
 		$this->module->sendCallback();
 		die;
 	}
-	
+
 }

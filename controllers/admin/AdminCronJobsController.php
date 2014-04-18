@@ -30,77 +30,77 @@ class AdminCronJobsController extends ModuleAdminController
 	{
 		if (Tools::getValue('token') != Configuration::get('CRONJOBS_EXECUTION_TOKEN'))
 			die;
-			
+
 		parent::__construct();
-		
+
 		$this->postProcess();
-		
+
 		die;
 	}
-	
+
 	public function postProcess()
 	{
 		$this->module->sendCallback();
-		
+
 		ob_start();
-		
+
 		$this->runModulesCrons();
 		$this->runTasksCrons();
-		
+
 		ob_end_clean();
 	}
-	
+
 	protected function runModulesCrons()
 	{
 		$query = 'SELECT * FROM '._DB_PREFIX_.$this->module->name.' WHERE `active` = 1 AND `id_module` IS NOT NULL';
 		$crons = Db::getInstance()->executeS($query);
-		
+
 		if (is_array($crons) && (count($crons) > 0))
 			foreach ($crons as &$cron)
 				if ($this->shouldBeExecuted($cron) == true)
 					Hook::exec('actionCronJob', array(), $cron['id_module']);
 	}
-	
+
 	protected function runTasksCrons()
 	{
 		$query = 'SELECT * FROM '._DB_PREFIX_.$this->module->name.' WHERE `active` = 1 AND `id_module` IS NULL';
 		$crons = Db::getInstance()->executeS($query);
-		
+
 		if (is_array($crons) && (count($crons) > 0))
 			foreach ($crons as &$cron)
 				if ($this->shouldBeExecuted($cron) == true)
 					Tools::file_get_contents(urldecode($cron['task']), false);
 	}
-	
+
 	protected function shouldBeExecuted($cron)
 	{
 		$hour = $cron['hour'];
 		$day = $cron['day'];
 		$month = $cron['month'];
 		$day_of_week = $cron['day_of_week'];
-		
+
 		$date = $orig = new DateTime();
 		$date->modify(date('F', strtotime('January +'.((($month == -1) ? date('m') : $month) - 1).' months')));
 		$date->setDate($date->format('Y'), $date->format('m'), ($day == -1) ? date('d') : $day);
-		
+
 		if ($day_of_week != -1)
 			$date->modify(date('l', strtotime('Sunday +'.$day_of_week.' days')));
 		else
 			$day_of_week = date('l');
-		
+
 		$date->setTime(($hour == -1) ? date('H') : $hour, date('i'), date('s'));
-		
+
 		$interval = $orig->diff($date);
 		if ($interval->format('%R') == '-')
 			$date->modify('+1 year');
 
 		return (bool)$this->validateDate($day_of_week.' '.$date->format('Y-m-d H'));
 	}
-	
+
 	protected function validateDate($date, $format = 'l Y-m-d H')
 	{
 		$temp = DateTime::createFromFormat($format, $date);
 		return $temp && $temp->format($format) == $date;
 	}
-	
+
 }
