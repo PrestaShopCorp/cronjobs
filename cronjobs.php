@@ -40,7 +40,7 @@ class CronJobs extends PaymentModule
 	public function __construct()
 	{
 		$this->name = 'cronjobs';
-		$this->tab = 'admninistration';
+		$this->tab = 'administration';
 		$this->version = '1.0';
 		$this->module_key = '';
 
