@@ -1,5 +1,5 @@
 <?php
-/*
+/**
 * 2007-2014 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -105,12 +105,12 @@ class CronJobs extends PaymentModule
 		$tab = new Tab();
 		$tab->active = 1;
 		$tab->name = array();
-		$tab->class_name = "AdminCronJobs";
+		$tab->class_name = 'AdminCronJobs';
 
 		foreach (Language::getLanguages(true) as $lang)
-			$tab->name[$lang['id_lang']] = "Cron Jobs";
+			$tab->name[$lang['id_lang']] = 'Cron Jobs';
 
-		$tab->id_parent = (int)-1;
+		$tab->id_parent = (int) -1;
 		$tab->module = $this->name;
 
 		return $tab->add();
@@ -139,11 +139,11 @@ class CronJobs extends PaymentModule
 		$output = null;
 
 		if (Tools::isSubmit('submitCronJobs'))
-			$this->_postProcessConfiguration();
+			$this->postProcessConfiguration();
 		elseif (Tools::isSubmit('submitNewCronJob'))
-			$submit_cron = $this->_postProcessNewJob();
+			$submit_cron = $this->postProcessNewJob();
 		elseif (Tools::isSubmit('submitUpdateCronJob'))
-			$submit_cron = $this->_postProcessUpdateJob();
+			$submit_cron = $this->postProcessUpdateJob();
 
 		$this->context->smarty->assign(array(
 			'module_dir' => $this->_path,
@@ -161,15 +161,15 @@ class CronJobs extends PaymentModule
 
 			$output = $output.$this->context->smarty->fetch($this->local_path.'views/templates/admin/task.tpl').'<hr />';
 		}
-		
+
 		if (Tools::isSubmit('newcronjobs') || ((isset($submit_cron) == true) && ($submit_cron === false)))
 			$output = $output.$this->renderForm($this->getJobForm(), $this->getNewJobFormValues(), 'submitNewCronJob', true, $back_url).'<hr />';
 		elseif (Tools::isSubmit('updatecronjobs') && Tools::isSubmit('id_cronjob'))
 			$output = $output.$this->renderForm($this->getJobForm('Update cron job', true), $this->getUpdateJobFormValues(), 'submitUpdateCronJob', true, $back_url, true).'<hr />';
 		elseif (Tools::isSubmit('deletecronjobs') && Tools::isSubmit('id_cronjob'))
-			$this->_postProcessDeleteCronJob((int)Tools::getValue('id_cronjob'));
+			$this->postProcessDeleteCronJob((int)Tools::getValue('id_cronjob'));
 		elseif (Tools::isSubmit('statuscronjobs'))
-			$this->_postProcessUpdateJobStatus();
+			$this->postProcessUpdateJobStatus();
 		elseif (defined('_PS_HOST_MODE_') == false)
 		{
 			$output = $output.$this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl').'<hr />';
@@ -250,19 +250,19 @@ class CronJobs extends PaymentModule
 
 		$helper->toolbar_btn['new'] = array(
 			'href' => $this->context->link->getAdminLink('AdminModules', false)
-		   .'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name
-		   .'&newcronjobs=1&token='.Tools::getAdminTokenLite('AdminModules'),
+			.'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name
+			.'&newcronjobs=1&token='.Tools::getAdminTokenLite('AdminModules'),
 			'desc' => $this->l('Add new task')
 		);
 
 		$helper->token = Tools::getAdminTokenLite('AdminModules');
 		$helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
-		   .'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+			.'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 
 		return $helper->generateList($values, $this->getTasksList());
 	}
 
-	protected function _postProcessConfiguration()
+	protected function postProcessConfiguration()
 	{
 		if (Tools::isSubmit('cron_mode') == true)
 		{
@@ -273,7 +273,7 @@ class CronJobs extends PaymentModule
 		}
 	}
 
-	protected function _postProcessNewJob()
+	protected function postProcessNewJob()
 	{
 		if ($this->isNewJobValid() == true)
 		{
@@ -308,7 +308,7 @@ class CronJobs extends PaymentModule
 		return false;
 	}
 
-	protected function _postProcessUpdateJob()
+	protected function postProcessUpdateJob()
 	{
 		if (Tools::isSubmit('id_cronjob') == false)
 			return false;
@@ -321,13 +321,11 @@ class CronJobs extends PaymentModule
 		$day_of_week = (int)Tools::getValue('day_of_week');
 
 		$cronjob = Tools::getValue('id_cronjob');
-		$id_cronjob = (int)substr($cronjob, 1);
-		$cron_type = (int)substr($cronjob, 0, 1);
+		$id_cronjob = (int)Tools::substr($cronjob, 1);
+		$cron_type = (int)Tools::substr($cronjob, 0, 1);
 
 		if ($cron_type == TASKS_PREFIX)
-		{
 			$query = 'UPDATE '._DB_PREFIX_.$this->name.' SET `description` = \''.$description.'\', `task` = \''.$task.'\', `hour` = \''.$hour.'\', `day` = \''.$day.'\', `month` = \''.$month.'\', `day_of_week` = \''.$day_of_week.'\' WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'';
-		}
 		elseif ($cron_type == MODULES_PREFIX)
 		{
 			$temp = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.$this->name.'` WHERE `id_module` = \''.$id_cronjob.'\'');
@@ -346,14 +344,14 @@ class CronJobs extends PaymentModule
 		return $result;
 	}
 
-	protected function _postProcessUpdateJobStatus()
+	protected function postProcessUpdateJobStatus()
 	{
 		if (Tools::isSubmit('id_cronjob') == false)
 			return false;
 
 		$cronjob = Tools::getValue('id_cronjob');
-		$id_cronjob = (int)substr($cronjob, 1);
-		$cron_type = (int)substr($cronjob, 0, 1);
+		$id_cronjob = (int)Tools::substr($cronjob, 1);
+		$cron_type = (int)Tools::substr($cronjob, 0, 1);
 
 		if ($cron_type == TASKS_PREFIX)
 			Db::getInstance()->execute('UPDATE '._DB_PREFIX_.$this->name.' SET `active` = IF (`active`, 0, 1) WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
@@ -369,8 +367,8 @@ class CronJobs extends PaymentModule
 		}
 
 		Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', false)
-		   .'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name
-		   .'&token='.Tools::getAdminTokenLite('AdminModules'));
+			.'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name
+			.'&token='.Tools::getAdminTokenLite('AdminModules'));
 	}
 
 	protected function isNewJobValid()
@@ -467,14 +465,14 @@ class CronJobs extends PaymentModule
 		}
 	}
 
-	protected function _postProcessDeleteCronJob($id_cronjob)
+	protected function postProcessDeleteCronJob($id_cronjob)
 	{
 		$cronjob = Tools::getValue('id_cronjob');
-		$cron_type = (int)substr($cronjob, 0, 1);
+		$cron_type = (int)Tools::substr($cronjob, 0, 1);
 
 		if ($cron_type != MODULES_PREFIX)
 		{
-			$id_cronjob = (int)substr($id_cronjob, 1);
+			$id_cronjob = (int)Tools::substr($id_cronjob, 1);
 			Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.$this->name.' WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
 		}
 
@@ -558,7 +556,7 @@ class CronJobs extends PaymentModule
 		if (($update == true) && (Tools::isSubmit('id_cronjob')))
 		{
 			$cronjob = Tools::getValue('id_cronjob');
-			$cron_type = substr($cronjob, 0, 1);
+			$cron_type = (int)Tools::substr($cronjob, 0, 1);
 
 			if ($cron_type == TASKS_PREFIX)
 			{
@@ -658,8 +656,8 @@ class CronJobs extends PaymentModule
 	protected function getUpdateJobFormValues()
 	{
 		$cronjob = Tools::getValue('id_cronjob');
-		$id_cronjob = substr($cronjob, 1);
-		$cron_type = substr($cronjob, 0, 1);
+		$id_cronjob = Tools::substr($cronjob, 1);
+		$cron_type = (int)Tools::substr($cronjob, 0, 1);
 
 		if ($cron_type == TASKS_PREFIX)
 		{
@@ -700,7 +698,7 @@ class CronJobs extends PaymentModule
 		for ($hour = 0; $hour < 24; $hour += 1)
 			$data[] = array('id' => $hour, 'name' => date('H:i', mktime($hour, 0, 0, 0, 1)));
 
-		return  $data;
+		return $data;
 	}
 
 	protected function getDaysFormOptions()
@@ -710,7 +708,7 @@ class CronJobs extends PaymentModule
 		for ($day = 1; $day <= 31; $day += 1)
 			$data[] = array('id' => $day, 'name' => $day);
 
-		return  $data;
+		return $data;
 	}
 
 	protected function getMonthsFormOptions()
@@ -720,7 +718,7 @@ class CronJobs extends PaymentModule
 		for ($month = 1; $month <= 12; $month += 1)
 			$data[] = array('id' => $month, 'name' => $this->l(date('F', mktime(0, 0, 0, $month, 1))));
 
-		return  $data;
+		return $data;
 	}
 
 	protected function getDaysofWeekFormOptions()
@@ -730,7 +728,7 @@ class CronJobs extends PaymentModule
 		for ($day = 1; $day <= 7; $day += 1)
 			$data[] = array('id' => $day, 'name' => $this->l(date('l', mktime(0, 0, 0, 0, $day))));
 
-		return  $data;
+		return $data;
 	}
 
 	protected function getTasksList()
@@ -762,12 +760,12 @@ class CronJobs extends PaymentModule
 							unset($modules[$module_key]);
 
 			foreach ($tasks as &$task)
-			{	
+			{
 				if (empty($task['task']) == true)
 				{
 					$task['id_cronjob'] = MODULES_PREFIX.$task['id_module'];
 					$task['id_module'] = MODULES_PREFIX.$task['id_module'];
-					$module_info = Db::getInstance()->getRow('SELECT `name` FROM `'._DB_PREFIX_.'module` WHERE `id_module` = \''.substr($task['id_module'], 1).'\'');
+					$module_info = Db::getInstance()->getRow('SELECT `name` FROM `'._DB_PREFIX_.'module` WHERE `id_module` = \''.Tools::substr($task['id_module'], 1).'\'');
 					$task['description'] = Tools::safeOutput(Module::getModuleName($module_info['name']));
 					$task['task'] = $this->l('Module - Hook');
 				}

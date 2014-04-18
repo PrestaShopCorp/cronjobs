@@ -1,5 +1,5 @@
 <?php
-/*
+/**
 * 2007-2014 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -69,12 +69,15 @@ class AdminCronJobsController extends ModuleAdminController
 		if (is_array($crons) && (count($crons) > 0))
 			foreach ($crons as &$cron)
 				if ($this->shouldBeExecuted($cron) == true)
-					$result = Tools::file_get_contents(urldecode($cron['task']), false);
+					Tools::file_get_contents(urldecode($cron['task']), false);
 	}
 	
 	protected function shouldBeExecuted($cron)
 	{
-		extract($cron);
+		$hour = $cron['hour'];
+		$day = $cron['day'];
+		$month = $cron['month'];
+		$day_of_week = $cron['day_of_week'];
 		
 		$date = $orig = new DateTime();
 		$date->modify(date('F', strtotime('January +'.((($month == -1) ? date('m') : $month) - 1).' months')));
