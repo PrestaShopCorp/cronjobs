@@ -693,7 +693,7 @@ class CronJobs extends PaymentModule
 
 	protected function getHoursFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => $this->l('Every hour')));
+		$data = array(array('id' => '-1', 'name' => $this->l('Hourly (at the start of the hour)')));
 
 		for ($hour = 0; $hour < 24; $hour += 1)
 			$data[] = array('id' => $hour, 'name' => date('H:i', mktime($hour, 0, 0, 0, 1)));
@@ -703,7 +703,7 @@ class CronJobs extends PaymentModule
 
 	protected function getDaysFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => $this->l('Every day')));
+		$data = array(array('id' => '-1', 'name' => $this->l('Daily (at the start of the day)')));
 
 		for ($day = 1; $day <= 31; $day += 1)
 			$data[] = array('id' => $day, 'name' => $day);
@@ -713,7 +713,7 @@ class CronJobs extends PaymentModule
 
 	protected function getMonthsFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => $this->l('Every month')));
+		$data = array(array('id' => '-1', 'name' => $this->l('Monthly (at the start of the month)')));
 
 		for ($month = 1; $month <= 12; $month += 1)
 			$data[] = array('id' => $month, 'name' => $this->l(date('F', mktime(0, 0, 0, $month, 1))));
@@ -723,7 +723,7 @@ class CronJobs extends PaymentModule
 
 	protected function getDaysofWeekFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => $this->l('Every week day')));
+		$data = array(array('id' => '-1', 'name' => $this->l('Every week day (at the start of each day)')));
 
 		for ($day = 1; $day <= 7; $day += 1)
 			$data[] = array('id' => $day, 'name' => $this->l(date('l', mktime(0, 0, 0, 0, $day))));
