@@ -572,7 +572,7 @@ class CronJobs extends PaymentModule
 					'type' => 'text',
 					'name' => 'task',
 					'label' => $this->l('Target link'),
-					'desc' => $this->l('Define the link of your cron job.'),
+					'desc' => $this->l('Set the link of your cron job.'),
 					'placeholder' => Tools::getShopDomain(true, true).__PS_BASE_URI__.basename(_PS_ADMIN_DIR_).'/cron_currency_rates.php?secure_key='.md5(_COOKIE_KEY_.Configuration::get('PS_SHOP_NAME')),
 				);
 			}
