@@ -24,8 +24,8 @@
 *}
 
 <div class="panel">
-	<h3>Cron jobs</h3>
+	<h3>Reminder</h3>
 	<p>	
-		{l s='Do not forget to include the domain name in the target link to make it valid!' mod='cronjobs'}
+		{l s='Do not forget to use an absolute URL in the target link to make it valid!' mod='cronjobs'}
 	</p>
 </div>
