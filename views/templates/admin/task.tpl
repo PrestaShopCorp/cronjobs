@@ -24,9 +24,8 @@
 *}
 
 <div class="panel">
-	<h3>Cron jobs (by PrestaShop)</h3>
+	<h3>Cron jobs</h3>
 	<p>	
-		{l s='Create your task here!' mod='cronjobs'}<br />
-		{l s='Don\'t forget to include your domain name in the task to make it valid.' mod='cronjobs'}
+		{l s='Do not forget to include the domain name in the target link to make it valid!' mod='cronjobs'}
 	</p>
 </div>
