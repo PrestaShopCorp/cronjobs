@@ -53,8 +53,8 @@ class CronJobs extends PaymentModule
 
 		parent::__construct();
 
-		$this->displayName = $this->l('Cron jobs - By PrestaShop');
-		$this->description = $this->l('Manage all of your cron jobs at once.');
+		$this->displayName = $this->l('Cron jobs');
+		$this->description = $this->l('Manage all of your periodical web tasks from a single interface.');
 
 		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 	}
@@ -295,14 +295,14 @@ class CronJobs extends PaymentModule
 					VALUES (\''.$description.'\', \''.$task.'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\', NULL, TRUE)';
 
 				if (($result = Db::getInstance()->execute($query)) != false)
-					$this->setSuccessMessage('The task has been added');
+					$this->setSuccessMessage('The task has been added.');
 				else
-					$this->setErrorMessage('The task has not been added');
+					$this->setErrorMessage('The task has not been added.');
 
 				return $result;
 			}
 
-			$this->setErrorMessage('This cron task already exists');
+			$this->setErrorMessage('This cron task already exists.');
 		}
 
 		return false;
@@ -383,7 +383,7 @@ class CronJobs extends PaymentModule
 			$task = urlencode(Tools::getValue('task'));
 
 			if (strpos($task, urlencode(Tools::getShopDomain(true, true).__PS_BASE_URI__)) !== 0)
-				return $this->setErrorMessage('The task link you entered is not valid');
+				return $this->setErrorMessage('The task link you entered is not valid.');
 
 			$success = true;
 			$hour = Tools::getValue('hour');
@@ -392,13 +392,13 @@ class CronJobs extends PaymentModule
 			$day_of_week = Tools::getValue('day_of_week');
 
 			if ((($hour >= -1) && ($hour < 24)) == false)
-				$success &= $this->setErrorMessage('The value you choose for the hour is not valid');
+				$success &= $this->setErrorMessage('The value you chose for the hour is not valid.');
 			if ((($day >= -1) && ($day < 24)) == false)
-				$success &= $this->setErrorMessage('The value you choose for the day is not valid');
+				$success &= $this->setErrorMessage('The value you chose for the day is not valid.');
 			if ((($month >= -1) && ($month <= 31)) == false)
-				$success &= $this->setErrorMessage('The value you choose for the month is not valid');
+				$success &= $this->setErrorMessage('The value you chose for the month is not valid.');
 			if ((($day_of_week >= -1) && ($day_of_week < 7)) == false)
-				$success &= $this->setErrorMessage('The value you choose for the week\'s day is not valid');
+				$success &= $this->setErrorMessage('The value you chose for the day of the week is not valid.');
 
 			return $success;
 		}
@@ -450,16 +450,16 @@ class CronJobs extends PaymentModule
 		Configuration::updateValue('CRONJOBS_WEBSERVICE_ID', (int)$result);
 
 		if ((bool)$result == false)
-			return $this->setErrorMessage('An error occured while trying to contact the PrestaShop\'s webcrons service');
+			return $this->setErrorMessage('An error occured while trying to contact the PrestaShop\'s webcrons service.');
 
 		Configuration::updateValue('CRONJOBS_MODE', $cron_mode);
 
 		switch ($cron_mode)
 		{
 			case 'advanced':
-				return $this->setSuccessMessage('Your cron jobs have been successfully registered using the \'advanced\' mode');
+				return $this->setSuccessMessage('Your cron jobs have been successfully registered using the Advanced mode.');
 			case 'webservice':
-				return $this->setSuccessMessage('Your cron jobs have been successfully added to our webcrons service');
+				return $this->setSuccessMessage('Your cron jobs have been successfully added to PrestaShop\'s webcrons service.');
 			default:
 				return;
 		}
@@ -494,10 +494,10 @@ class CronJobs extends PaymentModule
 						'type' => 'radio',
 						'name' => 'cron_mode',
 						'label' => $this->l('Cron mode'),
-						'desc' => $this->l('Choose the mode you want your cron jobs to work with'),
+						'desc' => $this->l('Choose the mode you want your cron jobs to work with.'),
 						'values' => array(
-							array('id' => 'advanced', 'value' => 'advanced', 'label' => $this->l('Advanced')),
-							array('id' => 'webservice', 'value' => 'webservice', 'label' => $this->l('Webservice'))
+							array('id' => 'webservice', 'value' => 'webservice', 'label' => $this->l('Basic')),
+							array('id' => 'advanced', 'value' => 'advanced', 'label' => $this->l('Advanced'))
 						),
 					),
 				),
@@ -526,8 +526,8 @@ class CronJobs extends PaymentModule
 			'advanced_help' =>
 				'<div class="alert alert-info">
 					<p>'
-						.$this->l('First of all, be sure \'php-cli\' or \'php-curl\' is installed on your server.')
-						.'<br />'.$this->l('To execute your cron jobs please insert one of the following commands in your crontab manager').':
+						.$this->l('First of all, make sure to have \'php-cli\' or \'php-curl\' installed on your server.')
+						.'<br />'.$this->l('To execute your cron jobs, please insert one of the following commands in your crontab manager:').'
 					</p>
 					<br />
 					<ul class="list-unstyled">
@@ -564,15 +564,15 @@ class CronJobs extends PaymentModule
 					'type' => 'text',
 					'name' => 'description',
 					'label' => $this->l('Description'),
-					'desc' => $this->l('Enter a description for this task'),
+					'desc' => $this->l('Enter a description for this task.'),
 					'placeholder' => $this->l('Update my currencies'),
 				);
 
 				$form[0]['form']['input'][] = array(
 					'type' => 'text',
 					'name' => 'task',
-					'label' => $this->l('Origin'),
-					'desc' => $this->l('Define the link of your cron task'),
+					'label' => $this->l('Target link'),
+					'desc' => $this->l('Set the link of your cron job.'),
 					'placeholder' => Tools::getShopDomain(true, true).__PS_BASE_URI__.basename(_PS_ADMIN_DIR_).'/cron_currency_rates.php?secure_key='.md5(_COOKIE_KEY_.Configuration::get('PS_SHOP_NAME')),
 				);
 			}
@@ -581,7 +581,7 @@ class CronJobs extends PaymentModule
 				$form[0]['form']['input'][] = array(
 					'type' => 'free',
 					'name' => 'task',
-					'label' => $this->l('Origin'),
+					'label' => $this->l('Target link'),
 				);
 			}
 		}
@@ -591,15 +591,15 @@ class CronJobs extends PaymentModule
 				'type' => 'text',
 				'name' => 'description',
 				'label' => $this->l('Description'),
-				'desc' => $this->l('Enter a description for this task'),
+				'desc' => $this->l('Enter a description for this task.'),
 				'placeholder' => $this->l('Update my currencies'),
 			);
 
 			$form[0]['form']['input'][] = array(
 				'type' => 'text',
 				'name' => 'task',
-				'label' => $this->l('Origin'),
-				'desc' => $this->l('Define the link of your cron task'),
+				'label' => $this->l('Target link'),
+				'desc' => $this->l('Define the link of your cron job.'),
 				'placeholder' => Tools::getShopDomain(true, true).__PS_BASE_URI__.basename(_PS_ADMIN_DIR_).'/cron_currency_rates.php?secure_key='.md5(_COOKIE_KEY_.Configuration::get('PS_SHOP_NAME')),
 			);
 		}
@@ -693,7 +693,7 @@ class CronJobs extends PaymentModule
 
 	protected function getHoursFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => $this->l('Every hours')));
+		$data = array(array('id' => '-1', 'name' => $this->l('Hourly (at the start of the hour)')));
 
 		for ($hour = 0; $hour < 24; $hour += 1)
 			$data[] = array('id' => $hour, 'name' => date('H:i', mktime($hour, 0, 0, 0, 1)));
@@ -703,7 +703,7 @@ class CronJobs extends PaymentModule
 
 	protected function getDaysFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => $this->l('Every days')));
+		$data = array(array('id' => '-1', 'name' => $this->l('Daily (at the start of the day)')));
 
 		for ($day = 1; $day <= 31; $day += 1)
 			$data[] = array('id' => $day, 'name' => $day);
@@ -713,7 +713,7 @@ class CronJobs extends PaymentModule
 
 	protected function getMonthsFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => $this->l('Every months')));
+		$data = array(array('id' => '-1', 'name' => $this->l('Monthly (at the start of the month)')));
 
 		for ($month = 1; $month <= 12; $month += 1)
 			$data[] = array('id' => $month, 'name' => $this->l(date('F', mktime(0, 0, 0, $month, 1))));
@@ -723,7 +723,7 @@ class CronJobs extends PaymentModule
 
 	protected function getDaysofWeekFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => $this->l('Every week days')));
+		$data = array(array('id' => '-1', 'name' => $this->l('Every week day (at the start of each day)')));
 
 		for ($day = 1; $day <= 7; $day += 1)
 			$data[] = array('id' => $day, 'name' => $this->l(date('l', mktime(0, 0, 0, 0, $day))));
@@ -735,7 +735,7 @@ class CronJobs extends PaymentModule
 	{
 		return array(
 			'description' => array('title' => $this->l('Description'), 'type' => 'text', 'orderby' => false),
-			'task' => array('title' => $this->l('Origin'), 'type' => 'text', 'orderby' => false),
+			'task' => array('title' => $this->l('Target link'), 'type' => 'text', 'orderby' => false),
 			'hour' => array('title' => $this->l('Hour'), 'type' => 'text', 'orderby' => false),
 			'day' => array('title' => $this->l('Day'), 'type' => 'text', 'orderby' => false),
 			'month' => array('title' => $this->l('Month'), 'type' => 'text', 'orderby' => false),
@@ -792,10 +792,10 @@ class CronJobs extends PaymentModule
 				$module['id_cronjob'] = MODULES_PREFIX.$module['id_module'];
 				$module['description'] = Tools::safeOutput(Module::getModuleName($module['module']));
 				$module['task'] = $this->l('Module - Hook');
-				$module['hour'] = $this->l('Every hours');
-				$module['day'] = $this->l('Every days');
-				$module['month'] = $this->l('Every months');
-				$module['day_of_week'] = $this->l('Every week days');
+				$module['hour'] = $this->l('Every hour');
+				$module['day'] = $this->l('Every day');
+				$module['month'] = $this->l('Every month');
+				$module['day_of_week'] = $this->l('Every week day');
 				$module['last_execution'] = $this->l('Never');
 				$module['active'] = false;
 			}

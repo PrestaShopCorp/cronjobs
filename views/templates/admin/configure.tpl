@@ -24,12 +24,17 @@
 *}
 
 <div class="panel">
-	<h3>Cron jobs (by PrestaShop)</h3>
+	<h3>What does this module do?</h3>
 	<p>	
-		{l s='Use one of the three options offered by this module to manage your cron jobs' mod='cronjobs'}:
+		{l s='Originally, cron is Unix system tool that provides time-based job scheduling: you can create many cron jobs, which are then run periodically at fixed times, dates, or intervals.' mod='cronjobs'}
+		<br/>
+		{l s='This module provides you with a cron-like tool: you can create jobs which will call a given set of secure URLs to your PrestaShop store, thus triggering updates and other automated tasks.' mod='cronjobs'}
+	</p>
+	<p>
+		{l s='Use one of the two options below to manage your cron jobs:' mod='cronjobs'}
 		<ul>
-			<li>{l s='Advanced mode' mod='cronjobs'} (<i>{l s='for experimented users only' mod='cronjobs'}</i>);</li>
-			<li>{l s='Using the PrestaShop\'s cron jobs webservice' mod='cronjobs'} (<i>{l s='ensures the execution of your jobs' mod='cronjobs'}</i>).</li>
+			<li>{l s='Basic mode -- Uses the PrestaShop\'s cron jobs webservice to ensures the execution of your jobs.' mod='cronjobs'}</li>
+			<li>{l s='Advanced mode -- For experimented users only.' mod='cronjobs'}</li>
 		</ul>
 	</p>
 </div>
