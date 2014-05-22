@@ -450,7 +450,7 @@ class CronJobs extends PaymentModule
 		Configuration::updateValue('CRONJOBS_WEBSERVICE_ID', (int)$result);
 
 		if ((bool)$result == false)
-			return $this->setErrorMessage('An error occured while trying to contact the PrestaShop\'s webcrons service.');
+			return $this->setErrorMessage('An error occurred while trying to contact the PrestaShop\'s webcrons service.');
 
 		Configuration::updateValue('CRONJOBS_MODE', $cron_mode);
 
