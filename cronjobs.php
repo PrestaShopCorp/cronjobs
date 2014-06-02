@@ -425,6 +425,8 @@ class CronJobs extends PaymentModule
 		else
 			$cron_mode = Tools::getValue('cron_mode');
 
+		Configuration::updateValue('CRONJOBS_MODE', $cron_mode);
+
 		$admin_folder = str_replace(_PS_ROOT_DIR_.'/', null, _PS_ADMIN_DIR_);
 		$path = Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.$admin_folder;
 		$cron_url = $path.'/'.$this->context->link->getAdminLink('AdminCronJobs', false);
@@ -449,8 +451,10 @@ class CronJobs extends PaymentModule
 		$result = Tools::file_get_contents($this->webservice_url.$webservice_id, false, $context);
 		Configuration::updateValue('CRONJOBS_WEBSERVICE_ID', (int)$result);
 
-		if ((bool)$result == false)
+		if (((Tools::isSubmit('install') == false) && (Tools::isSubmit('reset') == false)) && ((bool)$result == false))
 			return $this->setErrorMessage('An error occurred while trying to contact the PrestaShop\'s webcrons service.');
+		elseif (((Tools::isSubmit('install') == true) || (Tools::isSubmit('reset') == true)) && ((bool)$result == false))
+			return true;
 
 		Configuration::updateValue('CRONJOBS_MODE', $cron_mode);
 
