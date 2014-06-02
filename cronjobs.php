@@ -137,6 +137,7 @@ class CronJobs extends PaymentModule
 	public function getContent()
 	{
 		$output = null;
+		$this->checkLocalEnvironment();
 
 		if (Tools::isSubmit('submitCronJobs'))
 			$this->postProcessConfiguration();
@@ -151,6 +152,7 @@ class CronJobs extends PaymentModule
 		));
 
 		$this->context->smarty->assign('form_errors', $this->_errors);
+		$this->context->smarty->assign('form_infos', $this->_warnings);
 		$this->context->smarty->assign('form_successes', $this->_successes);
 
 		if ((Tools::isSubmit('submitNewCronJob') || Tools::isSubmit('newcronjobs') || Tools::isSubmit('updatecronjobs')) && ((isset($submit_cron) == false) || ($submit_cron === false)))
@@ -191,6 +193,15 @@ class CronJobs extends PaymentModule
 		ob_end_flush();
 		ob_flush();
 		flush();
+	}
+
+	protected function checkLocalEnvironment()
+	{
+		$local_ips = array('127.0.0.1', '::1');
+
+		if (in_array(Tools::getRemoteAddr(), $local_ips) == true)
+			$this->setWarningMessage('You are using the Cronjobs module on a local installation.
+			This module works better on an online installation: you won\'t be able to use the Basic mode or call remote cron tasks reliably in the current environment');
 	}
 
 	protected function renderForm($form, $form_values, $action, $cancel = false, $back_url = false, $update = false)
@@ -416,6 +427,12 @@ class CronJobs extends PaymentModule
 	{
 		$this->_successes[] = $this->l($message);
 		return true;
+	}
+
+	protected function setWarningMessage($message)
+	{
+		$this->_warnings[] = $this->l($message);
+		return false;
 	}
 
 	protected function toggleWebservice($force_webservice = false)
