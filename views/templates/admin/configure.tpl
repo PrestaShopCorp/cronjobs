@@ -34,7 +34,7 @@
 		{l s='Use one of the two options below to manage your cron jobs:' mod='cronjobs'}
 		<ul>
 			<li>{l s='Basic mode -- Uses the PrestaShop\'s cron jobs webservice to ensures the execution of your jobs.' mod='cronjobs'}</li>
-			<li>{l s='Advanced mode -- For experimented users only.' mod='cronjobs'}</li>
+			<li>{l s='Advanced mode -- For experimented users only: use your own crontab manager instead of PrestaShop\'s webcron service.' mod='cronjobs'}</li>
 		</ul>
 	</p>
 </div>
