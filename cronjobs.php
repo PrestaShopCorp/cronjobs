@@ -469,7 +469,7 @@ class CronJobs extends PaymentModule
 		Configuration::updateValue('CRONJOBS_WEBSERVICE_ID', (int)$result);
 
 		if (((Tools::isSubmit('install') == false) && (Tools::isSubmit('reset') == false)) && ((bool)$result == false))
-			return $this->setErrorMessage('An error occurred while trying to contact the PrestaShop\'s webcrons service.');
+			return $this->setErrorMessage('An error occurred while trying to contact PrestaShop\'s webcron service.');
 		elseif (((Tools::isSubmit('install') == true) || (Tools::isSubmit('reset') == true)) && ((bool)$result == false))
 			return true;
 
@@ -547,8 +547,9 @@ class CronJobs extends PaymentModule
 			'advanced_help' =>
 				'<div class="alert alert-info">
 					<p>'
+						.$this->l('The Advanced mode enables you to use your own crontab file instead of relying on PrestaShop\'s webcron service.')
 						.$this->l('First of all, make sure to have \'php-cli\' or \'php-curl\' installed on your server.')
-						.'<br />'.$this->l('To execute your cron jobs, please insert one of the following commands in your crontab manager:').'
+						.'<br />'.$this->l('To execute your cron jobs, please insert one of the following lines (not both!) in your crontab manager:').'
 					</p>
 					<br />
 					<ul class="list-unstyled">
