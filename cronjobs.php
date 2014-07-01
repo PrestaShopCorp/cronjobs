@@ -34,8 +34,10 @@ class CronJobs extends PaymentModule
 {
 	protected $_errors;
 	protected $_successes;
+	protected $_warnings;
 
-	public $webservice_url = 'http://webcron.prestashop.com/crons';
+/* 	public $webservice_url = 'http://webcron.prestashop.com/crons'; */
+	public $webservice_url = 'http://webcron.gailla.fr/crons';
 
 	public function __construct()
 	{
@@ -87,7 +89,7 @@ class CronJobs extends PaymentModule
 			`day` INTEGER DEFAULT \'-1\',
 			`month` INTEGER DEFAULT \'-1\',
 			`day_of_week` INTEGER DEFAULT \'-1\',
-			`last_execution` VARCHAR(32) DEFAULT NULL,
+			`updated_at` DATETIME DEFAULT NULL,
 			`active` BOOLEAN DEFAULT FALSE,
 			PRIMARY KEY(`id_cronjob`),
 			INDEX (`id_module`))
@@ -302,7 +304,7 @@ class CronJobs extends PaymentModule
 			if ($result == false)
 			{
 				$query = 'INSERT INTO '._DB_PREFIX_.$this->name.'
-					(`description`, `task`, `hour`, `day`, `month`, `day_of_week`, `last_execution`, `active`)
+					(`description`, `task`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `active`)
 					VALUES (\''.$description.'\', \''.$task.'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\', NULL, TRUE)';
 
 				if (($result = Db::getInstance()->execute($query)) != false)
@@ -342,7 +344,7 @@ class CronJobs extends PaymentModule
 			$temp = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.$this->name.'` WHERE `id_module` = \''.$id_cronjob.'\'');
 
 			if ($temp == false)
-				$query = 'INSERT INTO '._DB_PREFIX_.$this->name.' (`id_module`, `hour`, `day`, `month`, `day_of_week`, `last_execution`) VALUES (\''.(int)$id_cronjob.'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\', NULL)';
+				$query = 'INSERT INTO '._DB_PREFIX_.$this->name.' (`id_module`, `hour`, `day`, `month`, `day_of_week`, `updated_at`) VALUES (\''.(int)$id_cronjob.'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\', NULL)';
 			else
 				$query = 'UPDATE '._DB_PREFIX_.$this->name.' SET `hour` = \''.$hour.'\', `day` = \''.$day.'\', `month` = \''.$month.'\', `day_of_week` = \''.$day_of_week.'\' WHERE `id_module` = \''.(int)$id_cronjob.'\'';
 		}
@@ -371,7 +373,7 @@ class CronJobs extends PaymentModule
 			$result = Db::getInstance()->getRow('SELECT id_cronjob FROM '._DB_PREFIX_.$this->name.' WHERE `id_module` = \''.(int)$id_cronjob.'\'');
 
 			if ($result == false)
-				Db::getInstance()->execute('INSERT INTO '._DB_PREFIX_.$this->name.' (`id_module`, `hour`, `day`, `month`, `day_of_week`, `last_execution`, `active`)
+				Db::getInstance()->execute('INSERT INTO '._DB_PREFIX_.$this->name.' (`id_module`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `active`)
 					VALUES (\''.(int)$id_cronjob.'\', \'-1\', \'-1\', \'-1\', \'-1\', NULL, TRUE)');
 			else
 				Db::getInstance()->execute('UPDATE '._DB_PREFIX_.$this->name.' SET `active` = IF (`active`, 0, 1) WHERE `id_module` = '.(int)$id_cronjob);
@@ -762,7 +764,7 @@ class CronJobs extends PaymentModule
 			'day' => array('title' => $this->l('Day'), 'type' => 'text', 'orderby' => false),
 			'month' => array('title' => $this->l('Month'), 'type' => 'text', 'orderby' => false),
 			'day_of_week' => array('title' => $this->l('Day of week'), 'type' => 'text', 'orderby' => false),
-			'last_execution' => array('title' => $this->l('Last execution'), 'type' => 'text', 'orderby' => false),
+			'updated_at' => array('title' => $this->l('Last execution'), 'type' => 'text', 'orderby' => false),
 			'active' => array('title' => $this->l('Active'), 'active' => 'status', 'type' => 'bool', 'align' => 'center', 'orderby' => false)
 		);
 	}
@@ -802,7 +804,7 @@ class CronJobs extends PaymentModule
 				$task['day'] = ($task['day'] == -1) ? $this->l('Every days') : (int)$task['day'];
 				$task['month'] = ($task['month'] == -1) ? $this->l('Every months') : $this->l(date('F', mktime(0, 0, 0, (int)$task['month'], 1)));
 				$task['day_of_week'] = ($task['day_of_week'] == -1) ? $this->l('Every week days') : $this->l(date('l', mktime(0, 0, 0, 0, (int)$task['day_of_week'])));
-				$task['last_execution'] = ($task['last_execution'] == 0) ? $this->l('Never') : $this->l(date('c', $task['last_execution']));
+				$task['updated_at'] = ($task['updated_at'] == 0) ? $this->l('Never') : date('Y-m-d H:i:s', strtotime($task['updated_at']));
 				$task['active'] = (bool)$task['active'];
 			}
 		}
@@ -818,7 +820,7 @@ class CronJobs extends PaymentModule
 				$module['day'] = $this->l('Every day');
 				$module['month'] = $this->l('Every month');
 				$module['day_of_week'] = $this->l('Every week day');
-				$module['last_execution'] = $this->l('Never');
+				$module['updated_at'] = $this->l('Never');
 				$module['active'] = false;
 			}
 		}

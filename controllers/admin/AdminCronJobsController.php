@@ -29,7 +29,7 @@ class AdminCronJobsController extends ModuleAdminController
 	public function __construct()
 	{
 		if (Tools::getValue('token') != Configuration::get('CRONJOBS_EXECUTION_TOKEN'))
-			die;
+			die('Invalid token');
 
 		parent::__construct();
 
@@ -58,7 +58,10 @@ class AdminCronJobsController extends ModuleAdminController
 		if (is_array($crons) && (count($crons) > 0))
 			foreach ($crons as &$cron)
 				if ($this->shouldBeExecuted($cron) == true)
+				{
 					Hook::exec('actionCronJob', array(), $cron['id_module']);
+					Db::getInstance()->execute('UPDATE '._DB_PREFIX_.$this->module->name.' SET `updated_at` = NOW() WHERE `id_cronjob` = \''.$cron['id_cronjob'].'\'');
+				}
 	}
 
 	protected function runTasksCrons()
@@ -69,7 +72,10 @@ class AdminCronJobsController extends ModuleAdminController
 		if (is_array($crons) && (count($crons) > 0))
 			foreach ($crons as &$cron)
 				if ($this->shouldBeExecuted($cron) == true)
+				{
 					Tools::file_get_contents(urldecode($cron['task']), false);
+					Db::getInstance()->execute('UPDATE '._DB_PREFIX_.$this->module->name.' SET `updated_at` = NOW() WHERE `id_cronjob` = \''.$cron['id_cronjob'].'\'');
+				}
 	}
 
 	protected function shouldBeExecuted($cron)
