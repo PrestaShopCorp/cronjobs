@@ -36,8 +36,7 @@ class CronJobs extends PaymentModule
 	protected $_successes;
 	protected $_warnings;
 
-/* 	public $webservice_url = 'http://webcron.prestashop.com/crons'; */
-	public $webservice_url = 'http://webcron.gailla.fr/crons';
+	public $webservice_url = 'http://webcron.prestashop.com/crons';
 
 	public function __construct()
 	{
