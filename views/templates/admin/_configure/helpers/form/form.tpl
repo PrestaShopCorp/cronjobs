@@ -29,7 +29,7 @@
 
 {block name="defaultForm"}
 
-{include file=$module_local_dir|cat:'views/templates/admin/alerts.tpl'}
+{$alerts}
 
 <ul class="nav nav-tabs" id="psp-form-tabs">
 	{$index = 1}

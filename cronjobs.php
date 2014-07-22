@@ -138,6 +138,7 @@ class CronJobs extends PaymentModule
 	public function getContent()
 	{
 		$output = null;
+
 		$this->checkLocalEnvironment();
 
 		if (Tools::isSubmit('submitCronJobs'))
@@ -237,6 +238,7 @@ class CronJobs extends PaymentModule
 			'languages' => $this->context->controller->getLanguages(),
 			'back_url' => $back_url,
 			'show_cancel_button' => $cancel,
+			'alerts' => $this->context->smarty->fetch($this->local_path.'views/templates/admin/alerts.tpl'),
 		);
 
 		return $helper->generateForm($form);
@@ -257,7 +259,8 @@ class CronJobs extends PaymentModule
 		$helper->listTotal = count($values);
 
 		$helper->tpl_vars = array(
-			'show_filters' => false
+			'show_filters' => false,
+			'alerts' => $this->context->smarty->fetch($this->local_path.'views/templates/admin/alerts.tpl'),
 		);
 
 		$helper->toolbar_btn['new'] = array(
