@@ -80,33 +80,15 @@ class AdminCronJobsController extends ModuleAdminController
 
 	protected function shouldBeExecuted($cron)
 	{
-		$hour = $cron['hour'];
-		$day = $cron['day'];
-		$month = $cron['month'];
-		$day_of_week = $cron['day_of_week'];
+		$hour = ($cron['hour'] == -1) ? date('H') : $cron['hour'];
+		$day = ($cron['day'] == -1) ? date('d') : $cron['day'];
+		$month = ($cron['month'] == -1) ? date('m') : $cron['month'];
+		$day_of_week = ($cron['day_of_week'] == -1) ? date('D') : date('D', strtotime('Sunday +'.($cron['day_of_week'] - 1).' days'));
 
-		$date = $orig = new DateTime();
-		$date->modify(date('F', strtotime('January +'.((($month == -1) ? date('m') : $month) - 1).' months')));
-		$date->setDate($date->format('Y'), $date->format('m'), ($day == -1) ? date('d') : $day);
+		$execution = $day_of_week.' '.date('Y').'-'.str_pad($month, 2, '0', STR_PAD_LEFT).'-'.str_pad($day, 2, '0', STR_PAD_LEFT).' '.str_pad($hour, 2, '0', STR_PAD_LEFT);
+		$now = date('D Y-m-d H');
 
-		if ($day_of_week != -1)
-			$date->modify(date('l', strtotime('Sunday +'.$day_of_week.' days')));
-		else
-			$day_of_week = date('l');
-
-		$date->setTime(($hour == -1) ? date('H') : $hour, date('i'), date('s'));
-
-		$interval = $orig->diff($date);
-		if ($interval->format('%R') == '-')
-			$date->modify('+1 year');
-
-		return (bool)$this->validateDate($day_of_week.' '.$date->format('Y-m-d H'));
-	}
-
-	protected function validateDate($date, $format = 'l Y-m-d H')
-	{
-		$temp = DateTime::createFromFormat($format, $date);
-		return $temp && $temp->format($format) == $date;
+		return !(bool)strcmp($now, $execution);
 	}
 
 }
