@@ -408,7 +408,7 @@ class CronJobs extends PaymentModule
 
 			if ((($hour >= -1) && ($hour < 24)) == false)
 				$success &= $this->setErrorMessage('The value you chose for the hour is not valid.');
-			if ((($day >= -1) && ($day < 24)) == false)
+			if ((($day >= -1) && ($day <= 31)) == false)
 				$success &= $this->setErrorMessage('The value you chose for the day is not valid.');
 			if ((($month >= -1) && ($month <= 31)) == false)
 				$success &= $this->setErrorMessage('The value you chose for the month is not valid.');
