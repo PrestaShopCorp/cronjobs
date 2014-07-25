@@ -1,3 +1,6 @@
 #content.bootstrap form .tab-pane:first-child .panel {
 	border-top-left-radius: 0;
 }
+#content.bootstrap form .radio {
+	height: 22px;
+}

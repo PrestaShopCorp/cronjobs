@@ -162,8 +162,6 @@ class CronJobs extends PaymentModule
 			$back_url = $this->context->link->getAdminLink('AdminModules', false)
 				.'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name
 				.'&token='.Tools::getAdminTokenLite('AdminModules');
-
-			$output = $output.$this->context->smarty->fetch($this->local_path.'views/templates/admin/task.tpl').'<hr />';
 		}
 
 		if (Tools::isSubmit('newcronjobs') || ((isset($submit_cron) == true) && ($submit_cron === false)))
@@ -519,10 +517,11 @@ class CronJobs extends PaymentModule
 						'type' => 'radio',
 						'name' => 'cron_mode',
 						'label' => $this->l('Cron mode'),
-						'desc' => $this->l('Choose the mode you want your cron jobs to work with.'),
 						'values' => array(
-							array('id' => 'webservice', 'value' => 'webservice', 'label' => $this->l('Basic')),
-							array('id' => 'advanced', 'value' => 'advanced', 'label' => $this->l('Advanced'))
+							array('id' => 'webservice', 'value' => 'webservice', 'label' => $this->l('Basic'),
+								'p' => $this->l('Uses the PrestaShop\'s cron jobs webservice to ensures the execution of your jobs.')),
+							array('id' => 'advanced', 'value' => 'advanced', 'label' => $this->l('Advanced'),
+								'p' => $this->l('For experimented users only: use your own crontab manager instead of PrestaShop\'s webcron service.'))
 						),
 					),
 				),
@@ -625,7 +624,7 @@ class CronJobs extends PaymentModule
 				'type' => 'text',
 				'name' => 'task',
 				'label' => $this->l('Target link'),
-				'desc' => $this->l('Define the link of your cron job.'),
+				'desc' => $this->l('Do not forget to use an absolute URL in the target link to make it valid! The link also has to be on the same domain as the shop.'),
 				'placeholder' => Tools::getShopDomain(true, true).__PS_BASE_URI__.basename(_PS_ADMIN_DIR_).'/cron_currency_rates.php?secure_key='.md5(_COOKIE_KEY_.Configuration::get('PS_SHOP_NAME')),
 			);
 		}
