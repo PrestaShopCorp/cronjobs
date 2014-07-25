@@ -1,6 +1,10 @@
-#content.bootstrap form .tab-pane:first-child .panel {
+.bootstrap form .tab-pane:first-child .panel {
 	border-top-left-radius: 0;
 }
-#content.bootstrap form .radio {
+.bootstrap form .radio {
 	height: 22px;
+}
+.bootstrap #cronjobs-logo {
+	margin-right: 10px;
+	margin-bottom: 10px;
 }

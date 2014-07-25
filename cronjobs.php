@@ -165,7 +165,7 @@ class CronJobs extends PaymentModule
 		}
 
 		if (Tools::isSubmit('newcronjobs') || ((isset($submit_cron) == true) && ($submit_cron === false)))
-			$output = $output.$this->renderForm($this->getJobForm(), $this->getNewJobFormValues(), 'submitNewCronJob', true, $back_url).'<hr />';
+			$output = $output.$this->renderForm($this->getJobForm(), $this->getNewJobFormValues(), 'submitNewCronJob', true, $back_url);
 		elseif (Tools::isSubmit('updatecronjobs') && Tools::isSubmit('id_cronjob'))
 			$output = $output.$this->renderForm($this->getJobForm('Update cron job', true), $this->getUpdateJobFormValues(), 'submitUpdateCronJob', true, $back_url, true).'<hr />';
 		elseif (Tools::isSubmit('deletecronjobs') && Tools::isSubmit('id_cronjob'))
@@ -174,8 +174,8 @@ class CronJobs extends PaymentModule
 			$this->postProcessUpdateJobStatus();
 		elseif (defined('_PS_HOST_MODE_') == false)
 		{
-			$output = $output.$this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl').'<hr />';
-			$output = $output.$this->renderForm($this->getForm(), $this->getFormValues(), 'submitCronJobs').'<hr />';
+			$output = $output.$this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
+			$output = $output.$this->renderForm($this->getForm(), $this->getFormValues(), 'submitCronJobs');
 		}
 
 		return $output.$this->renderTasksList();
