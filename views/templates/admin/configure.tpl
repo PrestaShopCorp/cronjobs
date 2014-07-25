@@ -26,7 +26,7 @@
 <div class="panel">
 	<h3>What does this module do?</h3>
 	<p>
-		<img src="{$module_dir}/logo.png" class="pull-left" id="cronjobs-logo" />
+		<img src="{$module_dir|escape}/logo.png" class="pull-left" id="cronjobs-logo" />
 		{l s='Originally, cron is Unix system tool that provides time-based job scheduling: you can create many cron jobs, which are then run periodically at fixed times, dates, or intervals.' mod='cronjobs'}
 		<br/>
 		{l s='This module provides you with a cron-like tool: you can create jobs which will call a given set of secure URLs to your PrestaShop store, thus triggering updates and other automated tasks.' mod='cronjobs'}
