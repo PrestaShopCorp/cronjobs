@@ -557,7 +557,7 @@ class CronJobs extends PaymentModule
 					<br />
 					<ul class="list-unstyled">
 						<li><code>0 * * * * php '.$php_client_path.'</code></li>
-						<li><code>0 * * * * curl '.$curl_url.'</code></li>
+						<li><code>0 * * * * curl "'.$curl_url.'"</code></li>
 					</ul>
 				</div>'
 		);
