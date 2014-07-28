@@ -56,12 +56,12 @@ class CronJobs extends PaymentModule
 		parent::__construct();
 
 		$this->displayName = $this->l('Cron jobs');
-		$this->description = $this->l('Manage all of your periodical web tasks from a single interface.');
+		$this->description = $this->l('Manage all your automated web tasks from a single interface.');
 
 		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 
 		if (function_exists('curl_init') == false)
-			$this->warning = $this->l('In order to use your module, please activate cURL (PHP extension)');
+			$this->warning = $this->l('To be able to use this module, please activate cURL (PHP extension).');
 	}
 
 	public function install()
@@ -209,9 +209,9 @@ class CronJobs extends PaymentModule
 		$local_ips = array('127.0.0.1', '::1');
 
 		if (in_array(Tools::getRemoteAddr(), $local_ips) == true)
-			$this->setWarningMessage('You are using the Cronjobs module on a local installation.
-			This module works better on an online installation:
-			you won\'t be able to use the Basic mode or call remote cron tasks reliably in the current environment');
+			$this->setWarningMessage('You are using the Cronjobs module on a local installation:
+			you will not be able to use the Basic mode or reliably call remote cron tasks in your current environment.
+			To use this module at its best, you should switch to an online installation.');
 	}
 
 	protected function renderForm($form, $form_values, $action, $cancel = false, $back_url = false, $update = false)
@@ -316,9 +316,9 @@ class CronJobs extends PaymentModule
 					VALUES (\''.$description.'\', \''.$task.'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\', NULL, TRUE)';
 
 				if (($result = Db::getInstance()->execute($query)) != false)
-					$this->setSuccessMessage('The task has been added.');
+					$this->setSuccessMessage('The task has been successfully added.');
 				else
-					$this->setErrorMessage('The task has not been added.');
+					$this->setErrorMessage('An error happened: the task could not be added.');
 
 				return $result;
 			}
@@ -372,7 +372,7 @@ class CronJobs extends PaymentModule
 		}
 
 		if (($result = Db::getInstance()->execute($query)) != false)
-			$this->setSuccessMessage('The task has been updated');
+			$this->setSuccessMessage('The task has been updated.');
 		else
 			$this->setErrorMessage('The task has not been updated');
 
@@ -418,7 +418,7 @@ class CronJobs extends PaymentModule
 			$task = urlencode(Tools::getValue('task'));
 
 			if (strpos($task, urlencode(Tools::getShopDomain(true, true).__PS_BASE_URI__)) !== 0)
-				return $this->setErrorMessage('The task link you entered is not valid.');
+				return $this->setErrorMessage('The target link you entered is not valid. It should be an absolute URL, on the same domain as your shop.');
 
 			$success = true;
 			$hour = Tools::getValue('hour');
@@ -427,7 +427,7 @@ class CronJobs extends PaymentModule
 			$day_of_week = Tools::getValue('day_of_week');
 
 			if ((($hour >= -1) && ($hour < 24)) == false)
-				$success &= $this->setErrorMessage('The value you chose for the hour is not valid.');
+				$success &= $this->setErrorMessage('The value you chose for the hour is not valid. It should be between 00:00 and 23:59.');
 			if ((($day >= -1) && ($day <= 31)) == false)
 				$success &= $this->setErrorMessage('The value you chose for the day is not valid.');
 			if ((($month >= -1) && ($month <= 31)) == false)
@@ -541,9 +541,9 @@ class CronJobs extends PaymentModule
 						'label' => $this->l('Cron mode'),
 						'values' => array(
 							array('id' => 'webservice', 'value' => 'webservice', 'label' => $this->l('Basic'),
-								'p' => $this->l('Uses the PrestaShop\'s cron jobs webservice to ensures the execution of your jobs.')),
+								'p' => $this->l('Use the PrestaShop cron jobs webservice to execute your tasks.')),
 							array('id' => 'advanced', 'value' => 'advanced', 'label' => $this->l('Advanced'),
-								'p' => $this->l('For experimented users only: use your own crontab manager instead of PrestaShop\'s webcron service.'))
+								'p' => $this->l('For advanced users only: use your own crontab manager instead of PrestaShop webcron service.'))
 						),
 					),
 				),
@@ -572,8 +572,8 @@ class CronJobs extends PaymentModule
 			'advanced_help' =>
 				'<div class="alert alert-info">
 					<p>'
-						.$this->l('The Advanced mode enables you to use your own crontab file instead of relying on PrestaShop\'s webcron service.')
-						.$this->l('First of all, make sure to have \'php-cli\' or \'php-curl\' installed on your server.')
+						.$this->l('The Advanced mode enables you to use your own crontab file instead of PrestaShop webcron service. ')
+						.$this->l('First of all, make sure \'php-cli\' or \'php-curl\' are installed on your server.')
 						.'<br />'.$this->l('To execute your cron jobs, please insert one of the following lines (not both!) in your crontab manager:').'
 					</p>
 					<br />
@@ -745,7 +745,7 @@ class CronJobs extends PaymentModule
 
 	protected function getHoursFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => $this->l('Hourly (at the start of the hour)')));
+		$data = array(array('id' => '-1', 'name' => $this->l('Hourly (on the hour)')));
 
 		for ($hour = 0; $hour < 24; $hour += 1)
 			$data[] = array('id' => $hour, 'name' => date('H:i', mktime($hour, 0, 0, 0, 1)));
@@ -755,7 +755,7 @@ class CronJobs extends PaymentModule
 
 	protected function getDaysFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => $this->l('Daily (at the start of the day)')));
+		$data = array(array('id' => '-1', 'name' => $this->l('Daily (at midnight)')));
 
 		for ($day = 1; $day <= 31; $day += 1)
 			$data[] = array('id' => $day, 'name' => $day);
@@ -765,7 +765,7 @@ class CronJobs extends PaymentModule
 
 	protected function getMonthsFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => $this->l('Monthly (at the start of the month)')));
+		$data = array(array('id' => '-1', 'name' => $this->l('Monthly (on the 1st)')));
 
 		for ($month = 1; $month <= 12; $month += 1)
 			$data[] = array('id' => $month, 'name' => $this->l(date('F', mktime(0, 0, 0, $month, 1))));
@@ -775,7 +775,7 @@ class CronJobs extends PaymentModule
 
 	protected function getDaysofWeekFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => $this->l('Every week day (at the start of each day)')));
+		$data = array(array('id' => '-1', 'name' => $this->l('Every day of the week (each day at midnight)')));
 
 		for ($day = 1; $day <= 7; $day += 1)
 			$data[] = array('id' => $day, 'name' => $this->l(date('l', mktime(0, 0, 0, 0, $day))));
@@ -830,10 +830,10 @@ class CronJobs extends PaymentModule
 					$task['task'] = Tools::safeOutput(urldecode($task['task']));
 				}
 
-				$task['hour'] = ($task['hour'] == -1) ? $this->l('Every hours') : date('H:i', mktime((int)$task['hour'], 0, 0, 0, 1));
-				$task['day'] = ($task['day'] == -1) ? $this->l('Every days') : (int)$task['day'];
-				$task['month'] = ($task['month'] == -1) ? $this->l('Every months') : $this->l(date('F', mktime(0, 0, 0, (int)$task['month'], 1)));
-				$task['day_of_week'] = ($task['day_of_week'] == -1) ? $this->l('Every week days') : $this->l(date('l', mktime(0, 0, 0, 0, (int)$task['day_of_week'])));
+				$task['hour'] = ($task['hour'] == -1) ? $this->l('Every hour') : date('H:i', mktime((int)$task['hour'], 0, 0, 0, 1));
+				$task['day'] = ($task['day'] == -1) ? $this->l('Every day') : (int)$task['day'];
+				$task['month'] = ($task['month'] == -1) ? $this->l('Every month') : $this->l(date('F', mktime(0, 0, 0, (int)$task['month'], 1)));
+				$task['day_of_week'] = ($task['day_of_week'] == -1) ? $this->l('Every day of the week') : $this->l(date('l', mktime(0, 0, 0, 0, (int)$task['day_of_week'])));
 				$task['updated_at'] = ($task['updated_at'] == 0) ? $this->l('Never') : date('Y-m-d H:i:s', strtotime($task['updated_at']));
 				$task['active'] = (bool)$task['active'];
 			}
@@ -849,7 +849,7 @@ class CronJobs extends PaymentModule
 				$module['hour'] = $this->l('Every hour');
 				$module['day'] = $this->l('Every day');
 				$module['month'] = $this->l('Every month');
-				$module['day_of_week'] = $this->l('Every week day');
+				$module['day_of_week'] = $this->l('Every day of the week');
 				$module['updated_at'] = $this->l('Never');
 				$module['active'] = false;
 			}

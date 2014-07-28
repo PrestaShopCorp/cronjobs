@@ -40,7 +40,7 @@
 	
 	{if (isset($form_infos)) && (count($form_infos) > 0)}
 		<div class="alert alert-warning">
-			<h4>{l s='Notice!' mod='cronjobs'}</h4>
+			<h4>{l s='Warning!' mod='cronjobs'}</h4>
 			<ul class="list-unstyled">
 			{foreach from=$form_infos item='message'}
 				<li>{$message|escape:'htmlall':'UTF-8'}</li>
