@@ -600,13 +600,13 @@ class CronJobs extends PaymentModule
 			),
 		);
 
+		$currencies_cron_url = Tools::getShopDomain(true, true).__PS_BASE_URI__.basename(_PS_ADMIN_DIR_);
+		$currencies_cron_url .= '/cron_currency_rates.php?secure_key='.md5(_COOKIE_KEY_.Configuration::get('PS_SHOP_NAME'));
+
 		if (($update == true) && (Tools::isSubmit('id_cronjob')))
 		{
 			$cronjob = Tools::getValue('id_cronjob');
 			$cron_type = (int)Tools::substr($cronjob, 0, 1);
-
-			$currencies_cron_url = Tools::getShopDomain(true, true).__PS_BASE_URI__.basename(_PS_ADMIN_DIR_);
-			$currencies_cron_url .= '/cron_currency_rates.php?secure_key='.md5(_COOKIE_KEY_.Configuration::get('PS_SHOP_NAME'));
 
 			if ($cron_type == TASKS_PREFIX)
 			{
