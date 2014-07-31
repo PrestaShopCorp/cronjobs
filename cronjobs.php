@@ -464,7 +464,7 @@ class CronJobs extends PaymentModule
 		if ($force_webservice !== false)
 			$cron_mode = 'webservice';
 		else
-			$cron_mode = Tools::getValue('cron_mode');
+			$cron_mode = Tools::getValue('cron_mode', 'webservice');
 
 		Configuration::updateValue('CRONJOBS_MODE', $cron_mode);
 
