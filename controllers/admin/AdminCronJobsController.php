@@ -28,7 +28,7 @@ class AdminCronJobsController extends ModuleAdminController
 {
 	public function __construct()
 	{
-		if (Tools::getValue('token') != Configuration::get('CRONJOBS_EXECUTION_TOKEN'))
+		if (Tools::getValue('token') != Configuration::get('CRONJOBS_EXECUTION_TOKEN', null, 0, 0))
 			die('Invalid token');
 
 		parent::__construct();
