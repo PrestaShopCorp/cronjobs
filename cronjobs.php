@@ -537,7 +537,7 @@ class CronJobs extends PaymentModule
 		$token = Configuration::get('CRONJOBS_EXECUTION_TOKEN', null, 0, 0);
 		$php_client_path = $this->local_path.'classes/php_client.php token='.$token;
 
-		$admin_folder = str_replace(_PS_ROOT_DIR_.'/', null, _PS_ADMIN_DIR_);
+		$admin_folder = str_replace(_PS_ROOT_DIR_.'/', null, basename(_PS_ADMIN_DIR_));
 		$path = Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.$admin_folder.'/';
 		$curl_url = $path.$this->context->link->getAdminLink('AdminCronJobs', false);
 		$curl_url .= '&token='.$token;
