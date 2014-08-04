@@ -42,7 +42,7 @@ class CronJobs extends PaymentModule
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.0.1';
+		$this->version = '1.0.2';
 		$this->module_key = '';
 
 		$this->currencies = true;
@@ -834,8 +834,7 @@ class CronJobs extends PaymentModule
 			{
 				if (empty($task['task']) == true)
 				{
-					$query = 'SELECT `name` FROM `'._DB_PREFIX_.'module` WHERE `id_module` = \''.Tools::substr($task['id_module'], 1).'\'
-						AND `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'';
+					$query = 'SELECT `name` FROM `'._DB_PREFIX_.'module` WHERE `id_module` = \''.Tools::substr($task['id_module'], 1).'\'';
 					$module_info = Db::getInstance()->getRow($query);
 
 					$task['id_cronjob'] = MODULES_PREFIX.$task['id_module'];
