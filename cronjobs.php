@@ -27,9 +27,6 @@
 if (!defined('_PS_VERSION_'))
 	exit;
 
-define('TASKS_PREFIX', 1);
-define('MODULES_PREFIX', 2);
-
 class CronJobs extends PaymentModule
 {
 	protected $_errors;
@@ -42,7 +39,7 @@ class CronJobs extends PaymentModule
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.0.2';
+		$this->version = '1.0.3';
 		$this->module_key = '';
 
 		$this->currencies = true;
@@ -346,36 +343,19 @@ class CronJobs extends PaymentModule
 		$month = (int)Tools::getValue('month');
 		$day_of_week = (int)Tools::getValue('day_of_week');
 
-		$cronjob = Tools::getValue('id_cronjob');
-		$id_cronjob = (int)Tools::substr($cronjob, 1);
-		$cron_type = (int)Tools::substr($cronjob, 0, 1);
+		$id_cronjob = (int)Tools::getValue('id_cronjob');
 				
 		$id_shop = (int)$this->context->shop->id;
 		$id_shop_group = (int)$this->context->shop->id_shop_group;
 
-		if ($cron_type == TASKS_PREFIX)
-		{
-			$query = 'UPDATE '._DB_PREFIX_.$this->name.'
-				SET `description` = \''.$description.'\',
-					`task` = \''.$task.'\',
-					`hour` = \''.$hour.'\',
-					`day` = \''.$day.'\',
-					`month` = \''.$month.'\',
-					`day_of_week` = \''.$day_of_week.'\'
-				WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'';
-		}
-		elseif ($cron_type == MODULES_PREFIX)
-		{
-			$temp = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.$this->name.'` WHERE `id_module` = \''.$id_cronjob.'\'');
-
-			if ($temp == false)
-				$query = 'INSERT INTO '._DB_PREFIX_.$this->name.' (`id_module`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `id_shop`, `id_shop_group`)
-					VALUES (\''.(int)$id_cronjob.'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\', NULL, \''.$id_shop.'\', \''.$id_shop_group.'\')';
-			else
-				$query = 'UPDATE '._DB_PREFIX_.$this->name.'
-					SET `hour` = \''.$hour.'\', `day` = \''.$day.'\', `month` = \''.$month.'\', `day_of_week` = \''.$day_of_week.'\'
-					WHERE `id_module` = \''.(int)$id_cronjob.'\' AND `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'';
-		}
+		$query = 'UPDATE '._DB_PREFIX_.$this->name.'
+			SET `description` = \''.$description.'\',
+				`task` = \''.$task.'\',
+				`hour` = \''.$hour.'\',
+				`day` = \''.$day.'\',
+				`month` = \''.$month.'\',
+				`day_of_week` = \''.$day_of_week.'\'
+			WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'';
 
 		if (($result = Db::getInstance()->execute($query)) != false)
 			$this->setSuccessMessage('The task has been updated.');
@@ -390,27 +370,12 @@ class CronJobs extends PaymentModule
 		if (Tools::isSubmit('id_cronjob') == false)
 			return false;
 
-		$cronjob = Tools::getValue('id_cronjob');
-		$id_cronjob = (int)Tools::substr($cronjob, 1);
-		$cron_type = (int)Tools::substr($cronjob, 0, 1);
+		$id_cronjob = (int)Tools::getValue('id_cronjob');
 
 		$id_shop = (int)$this->context->shop->id;
 		$id_shop_group = (int)$this->context->shop->id_shop_group;
 
-		if ($cron_type == TASKS_PREFIX)
-			Db::getInstance()->execute('UPDATE '._DB_PREFIX_.$this->name.' SET `active` = IF (`active`, 0, 1) WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
-		elseif ($cron_type == MODULES_PREFIX)
-		{
-			$result = Db::getInstance()->getRow('SELECT id_cronjob FROM '._DB_PREFIX_.$this->name.' WHERE `id_module` = \''.(int)$id_cronjob.'\'
-				AND `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
-
-			if ($result == false)
-				Db::getInstance()->execute('INSERT INTO '._DB_PREFIX_.$this->name.' (`id_module`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `active`, `id_shop`, `id_shop_group`)
-					VALUES (\''.(int)$id_cronjob.'\', \'-1\', \'-1\', \'-1\', \'-1\', NULL, TRUE, \''.$id_shop.'\', \''.$id_shop_group.'\')');
-			else
-				Db::getInstance()->execute('UPDATE '._DB_PREFIX_.$this->name.' SET `active` = IF (`active`, 0, 1) WHERE `id_module` = '.(int)$id_cronjob.'
-					AND `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
-		}
+		Db::getInstance()->execute('UPDATE '._DB_PREFIX_.$this->name.' SET `active` = IF (`active`, 0, 1) WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
 
 		Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', false)
 			.'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name
@@ -523,14 +488,13 @@ class CronJobs extends PaymentModule
 
 	protected function postProcessDeleteCronJob($id_cronjob)
 	{
-		$cronjob = Tools::getValue('id_cronjob');
-		$cron_type = (int)Tools::substr($cronjob, 0, 1);
+		$id_cronjob = Tools::getValue('id_cronjob');
+		$id_module = Db::getInstance()->getValue('SELECT `id_module` FROM '._DB_PREFIX_.$this->name.' WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
 
-		if ($cron_type != MODULES_PREFIX)
-		{
-			$id_cronjob = (int)Tools::substr($id_cronjob, 1);
+		if ((bool)$id_module == false)
 			Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.$this->name.' WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
-		}
+		else
+			Db::getInstance()->execute('UPDATE '._DB_PREFIX_.$this->name.' SET `active` = FALSE WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
 
 		return Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', false)
 			.'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name
@@ -610,16 +574,36 @@ class CronJobs extends PaymentModule
 				),
 			),
 		);
+				
+		$id_shop = (int)$this->context->shop->id;
+		$id_shop_group = (int)$this->context->shop->id_shop_group;
 
 		$currencies_cron_url = Tools::getShopDomain(true, true).__PS_BASE_URI__.basename(_PS_ADMIN_DIR_);
 		$currencies_cron_url .= '/cron_currency_rates.php?secure_key='.md5(_COOKIE_KEY_.Configuration::get('PS_SHOP_NAME'));
 
 		if (($update == true) && (Tools::isSubmit('id_cronjob')))
 		{
-			$cronjob = Tools::getValue('id_cronjob');
-			$cron_type = (int)Tools::substr($cronjob, 0, 1);
+			$id_cronjob = (int)Tools::getValue('id_cronjob');
+			$id_module = (int)Db::getInstance()->getValue('SELECT `id_module` FROM `'._DB_PREFIX_.$this->name.'`
+				WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'
+					AND `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
 
-			if ($cron_type == TASKS_PREFIX)
+			if ((bool)$id_module == true)
+			{
+				$form[0]['form']['input'][] = array(
+					'type' => 'free',
+					'name' => 'description',
+					'label' => $this->l('Description'),
+					'placeholder' => $this->l('Update my currencies'),
+				);
+				
+				$form[0]['form']['input'][] = array(
+					'type' => 'free',
+					'name' => 'task',
+					'label' => $this->l('Target link'),
+				);
+			}
+			else
 			{
 				$form[0]['form']['input'][] = array(
 					'type' => 'text',
@@ -635,14 +619,6 @@ class CronJobs extends PaymentModule
 					'label' => $this->l('Target link'),
 					'desc' => $this->l('Set the link of your cron job.'),
 					'placeholder' => $currencies_cron_url,
-				);
-			}
-			elseif ($cron_type == MODULES_PREFIX)
-			{
-				$form[0]['form']['input'][] = array(
-					'type' => 'free',
-					'name' => 'task',
-					'label' => $this->l('Target link'),
 				);
 			}
 		}
@@ -716,46 +692,33 @@ class CronJobs extends PaymentModule
 
 	protected function getUpdateJobFormValues()
 	{
-		$cronjob = Tools::getValue('id_cronjob');
-		$id_cronjob = Tools::substr($cronjob, 1);
-		$cron_type = (int)Tools::substr($cronjob, 0, 1);
-		
 		$id_shop = (int)$this->context->shop->id;
 		$id_shop_group = (int)$this->context->shop->id_shop_group;
+		
+		$id_cronjob = (int)Tools::getValue('id_cronjob');
+		$cron = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.$this->name.'`
+			WHERE `id_cronjob` = \''.$id_cronjob.'\'
+			AND `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
 
-		if ($cron_type == TASKS_PREFIX)
+		if ((bool)$cron['id_module'] == false)
 		{
-			$task = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.$this->name.'` WHERE `id_cronjob` = \''.$id_cronjob.'\'
-				 AND `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
-			$description = Tools::safeOutput(Tools::getValue('description', $task['description']));
-			$origin = Tools::safeOutput(urldecode(Tools::getValue('task', $task['task'])));
+			$description = Tools::safeOutput(Tools::getValue('description', $cron['description']));
+			$task = Tools::safeOutput(urldecode(Tools::getValue('task', $cron['task'])));
 		}
 		else
 		{
-			$task = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.$this->name.'` WHERE `id_module` = \''.$id_cronjob.'\'
-				AND `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
-
-			if ($task == false)
-			{
-				$task['hour'] = -1;
-				$task['day'] = -1;
-				$task['month'] = -1;
-				$task['day_of_week'] = -1;
-			}
-
-			$query = 'SELECT `name` FROM `'._DB_PREFIX_.'module` WHERE `id_module` = \''.$id_cronjob.'\'';
-			$module_info = Db::getInstance()->getRow($query);
-			$description = '<p class="form-control-static">'.Tools::safeOutput(Module::getModuleName($module_info['name'])).'</p>';
-			$origin = '<p class="form-control-static">Module Hook</p>';
+			$module_name = Db::getInstance()->getValue('SELECT `name` FROM `'._DB_PREFIX_.'module` WHERE `id_module` = \''.$id_cronjob.'\'');
+			$description = '<p class="form-control-static"><strong>'.Tools::safeOutput(Module::getModuleName($module_name)).'</strong></p>';
+			$task = '<p class="form-control-static"><strong>'.$this->l('Module - Hook').'</strong></p>';
 		}
 
 		return array(
 			'description' => $description,
-			'task' => $origin,
-			'hour' => (int)Tools::getValue('hour', $task['hour']),
-			'day' => (int)Tools::getValue('day', $task['day']),
-			'month' => (int)Tools::getValue('month', $task['month']),
-			'day_of_week' => (int)Tools::getValue('day_of_week', $task['day_of_week']),
+			'task' => $task,
+			'hour' => (int)Tools::getValue('hour', $cron['hour']),
+			'day' => (int)Tools::getValue('day', $cron['day']),
+			'month' => (int)Tools::getValue('month', $cron['month']),
+			'day_of_week' => (int)Tools::getValue('day_of_week', $cron['day_of_week']),
 		);
 	}
 
@@ -818,64 +781,57 @@ class CronJobs extends PaymentModule
 		$id_shop = (int)$this->context->shop->id;
 		$id_shop_group = (int)$this->context->shop->id_shop_group;
 		
+		$this->addNewModulesTasks();
+		$crons = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.$this->name.'` WHERE `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
+
+		foreach ($crons as &$cron)
+		{
+			if (empty($cron['id_module']) == false)
+			{
+				$query = 'SELECT `name` FROM `'._DB_PREFIX_.'module` WHERE `id_module` = \''.(int)$cron['id_module'].'\'';
+				$module_name = Db::getInstance()->getValue($query);
+				
+				$cron['description'] = Tools::safeOutput(Module::getModuleName($module_name));
+				$cron['task'] = $this->l('Module - Hook');
+			}
+			else
+			{
+				$cron['task'] = Tools::safeOutput(urldecode($cron['task']));
+			}
+
+			$cron['hour'] = ($cron['hour'] == -1) ? $this->l('Every hour') : date('H:i', mktime((int)$cron['hour'], 0, 0, 0, 1));
+			$cron['day'] = ($cron['day'] == -1) ? $this->l('Every day') : (int)$cron['day'];
+			$cron['month'] = ($cron['month'] == -1) ? $this->l('Every month') : $this->l(date('F', mktime(0, 0, 0, (int)$cron['month'], 1)));
+			$cron['day_of_week'] = ($cron['day_of_week'] == -1) ? $this->l('Every day of the week') : $this->l(date('l', mktime(0, 0, 0, 0, (int)$cron['day_of_week'])));
+			$cron['updated_at'] = ($cron['updated_at'] == 0) ? $this->l('Never') : date('Y-m-d H:i:s', strtotime($cron['updated_at']));
+			$cron['active'] = (bool)$cron['active'];
+		}
+		
+		return $crons;
+	}
+	
+	protected function addNewModulesTasks()
+	{
+		$id_shop = (int)$this->context->shop->id;
+		$id_shop_group = (int)$this->context->shop->id_shop_group;
+		
 		$modules = Hook::getHookModuleExecList('actionCronJob');
-		$tasks = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.$this->name.'` WHERE `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
-
-		if (is_array($tasks) && count($tasks) > 0)
+		
+		foreach ($modules as $module)
 		{
+			$id_cronjob = (int)Db::getInstance()->getValue('SELECT `id_cronjob` FROM `'._DB_PREFIX_.$this->name.'`
+				WHERE `id_module` = \''.(int)$module['id_module'].'\'
+					AND `id_shop` = \''.$id_shop.'\'
+					AND `id_shop_group` = \''.$id_shop_group.'\'');
 
-			if (is_array($modules) && count($modules) > 0)
-				foreach ($tasks as &$task)
-					foreach ($modules as $module_key => &$module)
-						if ((is_null($module) == false) && ($task['id_module'] == $module['id_module']))
-							unset($modules[$module_key]);
-
-			foreach ($tasks as &$task)
+			if ((bool)$id_cronjob == false)
 			{
-				if (empty($task['task']) == true)
-				{
-					$query = 'SELECT `name` FROM `'._DB_PREFIX_.'module` WHERE `id_module` = \''.Tools::substr($task['id_module'], 1).'\'';
-					$module_info = Db::getInstance()->getRow($query);
-
-					$task['id_cronjob'] = MODULES_PREFIX.$task['id_module'];
-					$task['id_module'] = MODULES_PREFIX.$task['id_module'];
-					$task['description'] = Tools::safeOutput(Module::getModuleName($module_info['name']));
-					$task['task'] = $this->l('Module - Hook');
-				}
-				else
-				{
-					$task['id_cronjob'] = TASKS_PREFIX.$task['id_cronjob'];
-					$task['id_module'] = TASKS_PREFIX.$task['id_module'];
-					$task['task'] = Tools::safeOutput(urldecode($task['task']));
-				}
-
-				$task['hour'] = ($task['hour'] == -1) ? $this->l('Every hour') : date('H:i', mktime((int)$task['hour'], 0, 0, 0, 1));
-				$task['day'] = ($task['day'] == -1) ? $this->l('Every day') : (int)$task['day'];
-				$task['month'] = ($task['month'] == -1) ? $this->l('Every month') : $this->l(date('F', mktime(0, 0, 0, (int)$task['month'], 1)));
-				$task['day_of_week'] = ($task['day_of_week'] == -1) ? $this->l('Every day of the week') : $this->l(date('l', mktime(0, 0, 0, 0, (int)$task['day_of_week'])));
-				$task['updated_at'] = ($task['updated_at'] == 0) ? $this->l('Never') : date('Y-m-d H:i:s', strtotime($task['updated_at']));
-				$task['active'] = (bool)$task['active'];
+				$query = 'INSERT INTO '._DB_PREFIX_.$this->name.'
+					(`id_module`, `active`, `id_shop`, `id_shop_group`)
+					VALUES ('.(int)$module['id_module'].', FALSE, '.$id_shop.', '.$id_shop_group.')';
+					
+				Db::getInstance()->execute($query);
 			}
 		}
-
-		if (is_array($modules) && count($modules) > 0)
-		{
-			foreach ($modules as &$module)
-			{
-				$module['id_cronjob'] = MODULES_PREFIX.$module['id_module'];
-				$module['description'] = Tools::safeOutput(Module::getModuleName($module['module']));
-				$module['task'] = $this->l('Module - Hook');
-				$module['hour'] = $this->l('Every hour');
-				$module['day'] = $this->l('Every day');
-				$module['month'] = $this->l('Every month');
-				$module['day_of_week'] = $this->l('Every day of the week');
-				$module['updated_at'] = $this->l('Never');
-				$module['active'] = false;
-			}
-		}
-		else
-			$modules = array();
-
-		return array_merge($tasks, $modules);
 	}
 }
