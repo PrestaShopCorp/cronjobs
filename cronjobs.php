@@ -165,6 +165,7 @@ class CronJobs extends PaymentModule
 
 	public function getContent()
 	{
+		CronJobs::isActive(1);
 		$output = null;
 
 		$this->checkLocalEnvironment();
@@ -230,6 +231,11 @@ class CronJobs extends PaymentModule
 	
 	public static function isActive($id_module)
 	{
+		$module = Module::getInstanceByName('cronjobs');
+		
+		if (($module == false) || ($module->active == false))
+			return false;
+				
 		$query = 'SELECT `active` FROM '._DB_PREFIX_.'cronjobs WHERE `id_module` = \''.(int)$id_module.'\'';
 		return (bool)Db::getInstance()->getValue($query);
 	}
