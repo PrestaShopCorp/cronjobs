@@ -57,12 +57,21 @@ class AdminCronJobsController extends ModuleAdminController
 
 		if (is_array($crons) && (count($crons) > 0))
 			foreach ($crons as &$cron)
-				if ($this->shouldBeExecuted($cron) == true)
+			{
+				$module = Module::getInstanceById((int)$cron['id_module']);
+				
+				if ($module == false)
+				{
+					Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.$this->name.' WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'');
+					break;
+				}
+				elseif ($this->shouldBeExecuted($cron) == true)
 				{
 					Hook::exec('actionCronJob', array(), $cron['id_module']);
 					$query = 'UPDATE '._DB_PREFIX_.$this->module->name.' SET `updated_at` = NOW() WHERE `id_cronjob` = \''.$cron['id_cronjob'].'\'';
 					Db::getInstance()->execute($query);
 				}
+			}
 	}
 
 	protected function runTasksCrons()

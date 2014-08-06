@@ -67,7 +67,10 @@ class CronJobs extends PaymentModule
 		Configuration::updateValue('CRONJOBS_MODE', 'webservice');
 		Configuration::updateValue('CRONJOBS_EXECUTION_TOKEN', Tools::encrypt(_PS_ADMIN_DIR_.time()), false, 0, 0);
 
-		return $this->installDb() && $this->installTab() && parent::install() && $this->registerHook('backOfficeHeader') && $this->toggleWebservice(true);
+		return $this->installDb() && $this->installTab() && parent::install() &&
+			$this->registerHook('actionModuleRegisterHookAfter') && $this->registerHook('actionModuleUnRegisterHookAfter') &&
+			$this->registerHook('backOfficeHeader') &&
+			$this->toggleWebservice(true);
 	}
 
 	public function uninstall()
@@ -131,6 +134,28 @@ class CronJobs extends PaymentModule
 		}
 
 		return false;
+	}
+	
+	public function hookActionModuleRegisterHookAfter($params)
+	{
+		$hook_name = $params['hook_name'];
+
+		if (strcmp($hook_name, 'actionCronJob') === 0)
+		{
+			$module = $params['object'];
+			$this->registerModuleHook($module->id);
+		}
+	}
+	
+	public function hookActionModuleUnRegisterHookAfter($params)
+	{
+		$hook_name = $params['hook_name'];
+
+		if (strcmp($hook_name, 'actionCronJob') === 0)
+		{
+			$module = $params['object'];
+			$this->unregisterModuleHook($module->id);
+		}
 	}
 
 	public function hookBackOfficeHeader()
@@ -784,20 +809,27 @@ class CronJobs extends PaymentModule
 		$this->addNewModulesTasks();
 		$crons = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.$this->name.'` WHERE `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
 
-		foreach ($crons as &$cron)
+		foreach ($crons as $key => &$cron)
 		{
 			if (empty($cron['id_module']) == false)
 			{
+				$module = Module::getInstanceById((int)$cron['id_module']);
+				
+				if ($module == false)
+				{
+					Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.$this->name.' WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'');
+					unset($crons[$key]);
+					break;
+				}
+				
 				$query = 'SELECT `name` FROM `'._DB_PREFIX_.'module` WHERE `id_module` = \''.(int)$cron['id_module'].'\'';
 				$module_name = Db::getInstance()->getValue($query);
-				
+			
 				$cron['description'] = Tools::safeOutput(Module::getModuleName($module_name));
 				$cron['task'] = $this->l('Module - Hook');
 			}
 			else
-			{
 				$cron['task'] = Tools::safeOutput(urldecode($cron['task']));
-			}
 
 			$cron['hour'] = ($cron['hour'] == -1) ? $this->l('Every hour') : date('H:i', mktime((int)$cron['hour'], 0, 0, 0, 1));
 			$cron['day'] = ($cron['day'] == -1) ? $this->l('Every day') : (int)$cron['day'];
@@ -815,23 +847,57 @@ class CronJobs extends PaymentModule
 		$id_shop = (int)$this->context->shop->id;
 		$id_shop_group = (int)$this->context->shop->id_shop_group;
 		
-		$modules = Hook::getHookModuleExecList('actionCronJob');
+		$crons = Hook::getHookModuleExecList('actionCronJob');
 		
-		foreach ($modules as $module)
+		if ($crons == false)
+			return false;
+		
+		foreach ($crons as $cron)
 		{
+			$module = Module::getInstanceById((int)$cron['id_module']);
+			
+			if ($module == false)
+			{
+				Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.$this->name.' WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'');
+				break;
+			}
+			
+			$id_module = (int)$cron['id_module'];
 			$id_cronjob = (int)Db::getInstance()->getValue('SELECT `id_cronjob` FROM `'._DB_PREFIX_.$this->name.'`
-				WHERE `id_module` = \''.(int)$module['id_module'].'\'
-					AND `id_shop` = \''.$id_shop.'\'
-					AND `id_shop_group` = \''.$id_shop_group.'\'');
+				WHERE `id_module` = \''.$id_module.'\' AND `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
 
 			if ((bool)$id_cronjob == false)
-			{
-				$query = 'INSERT INTO '._DB_PREFIX_.$this->name.'
-					(`id_module`, `active`, `id_shop`, `id_shop_group`)
-					VALUES ('.(int)$module['id_module'].', FALSE, '.$id_shop.', '.$id_shop_group.')';
-					
-				Db::getInstance()->execute($query);
-			}
+				$this->registerModuleHook($id_module);
 		}
+	}
+	
+	protected function registerModuleHook($id_module)
+	{
+		$id_shop = (int)$this->context->shop->id;
+		$id_shop_group = (int)$this->context->shop->id_shop_group;
+		
+		$module = Module::getInstanceById($id_module);
+				
+		if (is_callable(array($module, 'getCronFrequency')) == true)
+		{
+			$frequency = $module->getCronFrequency();
+		
+			$query = 'INSERT INTO '._DB_PREFIX_.$this->name.'
+				(`id_module`, `hour`, `day`, `month`, `day_of_week`, `active`, `id_shop`, `id_shop_group`)
+				VALUES (\''.$id_module.'\', \''.$frequency['hour'].'\', \''.$frequency['day'].'\',
+					\''.$frequency['month'].'\', \''.$frequency['day_of_week'].'\',
+					TRUE, '.$id_shop.', '.$id_shop_group.')';
+		}
+		else
+			$query = 'INSERT INTO '._DB_PREFIX_.$this->name.'
+				(`id_module`, `active`, `id_shop`, `id_shop_group`)
+				VALUES ('.$id_module.', FALSE, '.$id_shop.', '.$id_shop_group.')';
+			
+		return Db::getInstance()->execute($query);
+	}
+	
+	protected function unregisterModuleHook($id_module)
+	{
+		return Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.$this->name.' WHERE `id_module` = \''.(int)$id_module.'\'');
 	}
 }
