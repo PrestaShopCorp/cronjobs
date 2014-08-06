@@ -227,6 +227,12 @@ class CronJobs extends PaymentModule
 		ob_flush();
 		flush();
 	}
+	
+	public static function isActive($id_module)
+	{
+		$query = 'SELECT `active` FROM '._DB_PREFIX_.'cronjobs WHERE `id_module` = \''.(int)$id_module.'\'';
+		return (bool)Db::getInstance()->getValue($query);
+	}
 
 	protected function checkLocalEnvironment()
 	{
