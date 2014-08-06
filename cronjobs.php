@@ -165,6 +165,7 @@ class CronJobs extends PaymentModule
 
 	public function getContent()
 	{
+		CronJobs::isActive(1);
 		$output = null;
 
 		$this->checkLocalEnvironment();
