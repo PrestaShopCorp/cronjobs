@@ -1,5 +1,5 @@
 <?php
-/*
+/**
 * 2007-2014 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -24,11 +24,12 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-require_once(dirname(__FILE__).'/../../../config/config.inc.php');
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
 
-$token = Tools::getValue('token');
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
 
-if ($token != Configuration::get('CRONJOBS_EXECUTION_TOKEN'))
-	exit(0);
-
-Hook::exec('actionCronJob');
+header('Location: ../');
+exit;

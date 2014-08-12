@@ -68,7 +68,7 @@ class AdminCronJobsController extends ModuleAdminController
 				elseif ($this->shouldBeExecuted($cron) == true)
 				{
 					Hook::exec('actionCronJob', array(), $cron['id_module']);
-					$query = 'UPDATE '._DB_PREFIX_.$this->module->name.' SET `updated_at` = NOW() WHERE `id_cronjob` = \''.$cron['id_cronjob'].'\'';
+					$query = 'UPDATE '._DB_PREFIX_.$this->module->name.' SET `updated_at` = NOW(), `active` = IF (`one_shot` = TRUE, FALSE, `active`) WHERE `id_cronjob` = \''.$cron['id_cronjob'].'\'';
 					Db::getInstance()->execute($query);
 				}
 			}
@@ -84,7 +84,7 @@ class AdminCronJobsController extends ModuleAdminController
 				if ($this->shouldBeExecuted($cron) == true)
 				{
 					Tools::file_get_contents(urldecode($cron['task']), false);
-					$query = 'UPDATE '._DB_PREFIX_.$this->module->name.' SET `updated_at` = NOW() WHERE `id_cronjob` = \''.$cron['id_cronjob'].'\'';
+					$query = 'UPDATE '._DB_PREFIX_.$this->module->name.' SET `updated_at` = NOW(), `active` = IF (`one_shot` = TRUE, FALSE, `active`) WHERE `id_cronjob` = \''.$cron['id_cronjob'].'\'';
 					Db::getInstance()->execute($query);
 				}
 	}
