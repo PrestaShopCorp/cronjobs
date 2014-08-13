@@ -24,7 +24,7 @@
 *}
 
 <div class="panel">
-	<h3>{l s='What does this module do?' mod='cronjobs'</h3>
+	<h3>{l s='What does this module do?' mod='cronjobs'}</h3>
 	<p>
 		<img src="{$module_dir|escape}/logo.png" class="pull-left" id="cronjobs-logo" />
 		{l s='Originally, cron is a Unix system tool that provides time-based job scheduling: you can create many cron jobs, which are then run periodically at fixed times, dates, or intervals.' mod='cronjobs'}
