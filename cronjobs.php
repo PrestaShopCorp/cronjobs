@@ -27,6 +27,9 @@
 if (!defined('_PS_VERSION_'))
 	exit;
 
+if (defined('_PS_ADMIN_DIR_') === false)
+	define('_PS_ADMIN_DIR_', _PS_ROOT_DIR_.'/admin/');
+
 class CronJobs extends PaymentModule
 {
 	protected $_errors;
@@ -59,18 +62,36 @@ class CronJobs extends PaymentModule
 
 		if (function_exists('curl_init') == false)
 			$this->warning = $this->l('To be able to use this module, please activate cURL (PHP extension).');
+		
+		$this->init();
 	}
 
 	public function install()
 	{
+		$token = Tools::encrypt(Tools::getShopDomainSsl().time());
+		
 		Configuration::updateValue('CRONJOBS_WEBSERVICE_ID', 0);
 		Configuration::updateValue('CRONJOBS_MODE', 'webservice');
-		Configuration::updateValue('CRONJOBS_EXECUTION_TOKEN', Tools::encrypt(_PS_ADMIN_DIR_.time()), false, 0, 0);
+		Configuration::updateValue('CRONJOBS_EXECUTION_TOKEN', $token, false, 0, 0);
+		Configuration::updateValue('CRONJOBS_ADMIN_DIR', Tools::encrypt(_PS_ADMIN_DIR_));
 
 		return $this->installDb() && $this->installTab() && parent::install() &&
 			$this->registerHook('actionModuleRegisterHookAfter') && $this->registerHook('actionModuleUnRegisterHookAfter') &&
 			$this->registerHook('backOfficeHeader') &&
 			$this->toggleWebservice(true);
+	}
+	
+	protected function init()
+	{
+		$cron_admin_dir = Configuration::get('CRONJOBS_ADMIN_DIR');
+		
+		if (strcmp(Tools::encrypt(_PS_ADMIN_DIR_), $cron_admin_dir) !== 0)
+		{
+			Configuration::updateValue('CRONJOBS_ADMIN_DIR', Tools::encrypt(_PS_ADMIN_DIR_));
+			
+			if (strcmp(Configuration::get('CRONJOBS_MODE'), 'webservice') !== 0)
+				$this->toggleWebservice(true);
+		}
 	}
 
 	public function uninstall()
@@ -478,17 +499,18 @@ class CronJobs extends PaymentModule
 			$cron_mode = 'webservice';
 		else
 			$cron_mode = Tools::getValue('cron_mode', 'webservice');
-
+		
+		$link = new Link();
+		
 		Configuration::updateValue('CRONJOBS_MODE', $cron_mode);
-
 		$admin_folder = str_replace(_PS_ROOT_DIR_.'/', null, _PS_ADMIN_DIR_);
 		$path = Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.$admin_folder;
-		$cron_url = $path.'/'.$this->context->link->getAdminLink('AdminCronJobs', false);
+		$cron_url = $path.'/'.$link->getAdminLink('AdminCronJobs', false);
 
 		$webservice_id = Configuration::get('CRONJOBS_WEBSERVICE_ID') ? '/'.Configuration::get('CRONJOBS_WEBSERVICE_ID') : null;
 
 		$data = array(
-			'callback' => $this->context->link->getModuleLink('cronjobs', 'callback'),
+			'callback' => $link->getModuleLink('cronjobs', 'callback'),
 			'cronjob' => $cron_url.'&token='.Configuration::get('CRONJOBS_EXECUTION_TOKEN', null, 0, 0),
 			'cron_token' => Configuration::get('CRONJOBS_EXECUTION_TOKEN', null, 0, 0),
 			'active' => ($cron_mode == 'advanced') ? false : true,
