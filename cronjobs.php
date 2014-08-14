@@ -35,7 +35,7 @@ require_once(dirname(__FILE__).'/classes/CronJobsForms.php');
 class CronJobs extends PaymentModule
 {
 	const EACH = -1;
-	
+
 	protected $_errors;
 	protected $_successes;
 	protected $_warnings;
@@ -46,7 +46,7 @@ class CronJobs extends PaymentModule
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.0.7';
+		$this->version = '1.0.8';
 		$this->module_key = '';
 
 		$this->currencies = true;
@@ -66,33 +66,34 @@ class CronJobs extends PaymentModule
 
 		if (function_exists('curl_init') == false)
 			$this->warning = $this->l('To be able to use this module, please activate cURL (PHP extension).');
-		
+
 		$this->init();
 	}
 
 	public function install()
 	{
 		$token = Tools::encrypt(Tools::getShopDomainSsl().time());
-		
+
 		Configuration::updateValue('CRONJOBS_WEBSERVICE_ID', 0);
 		Configuration::updateValue('CRONJOBS_MODE', 'webservice');
 		Configuration::updateValue('CRONJOBS_EXECUTION_TOKEN', $token, false, 0, 0);
 		Configuration::updateValue('CRONJOBS_ADMIN_DIR', Tools::encrypt(_PS_ADMIN_DIR_));
 
+		$this->toggleWebservice(true);
+
 		return $this->installDb() && $this->installTab() && parent::install() &&
 			$this->registerHook('actionModuleRegisterHookAfter') && $this->registerHook('actionModuleUnRegisterHookAfter') &&
-			$this->registerHook('backOfficeHeader') &&
-			$this->toggleWebservice(true);
+			$this->registerHook('backOfficeHeader');
 	}
-	
+
 	protected function init()
 	{
 		$cron_admin_dir = Configuration::get('CRONJOBS_ADMIN_DIR');
-		
+
 		if (strcmp(Tools::encrypt(_PS_ADMIN_DIR_), $cron_admin_dir) !== 0)
 		{
 			Configuration::updateValue('CRONJOBS_ADMIN_DIR', Tools::encrypt(_PS_ADMIN_DIR_));
-			
+
 			if (strcmp(Configuration::get('CRONJOBS_MODE'), 'webservice') !== 0)
 				$this->toggleWebservice(true);
 		}
@@ -161,7 +162,7 @@ class CronJobs extends PaymentModule
 
 		return false;
 	}
-	
+
 	public function hookActionModuleRegisterHookAfter($params)
 	{
 		$hook_name = $params['hook_name'];
@@ -172,7 +173,7 @@ class CronJobs extends PaymentModule
 			$this->registerModuleHook($module->id);
 		}
 	}
-	
+
 	public function hookActionModuleUnRegisterHookAfter($params)
 	{
 		$hook_name = $params['hook_name'];
@@ -255,18 +256,18 @@ class CronJobs extends PaymentModule
 		ob_flush();
 		flush();
 	}
-	
+
 	public static function isActive($id_module)
 	{
 		$module = Module::getInstanceByName('cronjobs');
-		
+
 		if (($module == false) || ($module->active == false))
 			return false;
-				
+
 		$query = 'SELECT `active` FROM '._DB_PREFIX_.'cronjobs WHERE `id_module` = \''.(int)$id_module.'\'';
 		return (bool)Db::getInstance()->getValue($query);
 	}
-	
+
 	/**
 	 * $taks should be a valid URL
 	 */
@@ -274,10 +275,10 @@ class CronJobs extends PaymentModule
 	{
 		if (self::isTaskURLValid($task) == false)
 			return false;
-		
+
 		$id_shop = (int)Context::getContext()->shop->id;
 		$id_shop_group = (int)Context::getContext()->shop->id_shop_group;
-		
+
 		$query = 'SELECT `active` FROM '._DB_PREFIX_.'cronjobs
 			WHERE `task` = \''.urlencode($task).'\' AND `updated_at` IS NULL
 				AND `one_shot` IS TRUE
@@ -285,14 +286,14 @@ class CronJobs extends PaymentModule
 
 		if ((bool)Db::getInstance()->getValue($query) == true)
 			return true;
-		
+
 		if (count($execution) == 0)
 		{
 			$query = 'INSERT INTO '._DB_PREFIX_.'cronjobs
 					(`description`, `task`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `one_shot`, `active`, `id_shop`, `id_shop_group`)
 					VALUES (\''.$description.'\', \''.urlencode($task).'\', \'0\', \''.CronJobs::EACH.'\', \''.CronJobs::EACH.'\', \''.CronJobs::EACH.'\',
 						NULL, TRUE, TRUE, '.$id_shop.', '.$id_shop_group.')';
-		
+
 			return Db::getInstance()->execute($query);
 		}
 		else
@@ -301,18 +302,18 @@ class CronJobs extends PaymentModule
 			$day = (int)$execution['day'];
 			$month = (int)$execution['month'];
 			$day_of_week = (int)$execution['day_of_week'];
-			
+
 			if ($this->isFrequencyValid($hour, $day, $month, $day_of_week))
 			{
 				$query = 'INSERT INTO '._DB_PREFIX_.'cronjobs
 					(`description`, `task`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `one_shot`, `active`, `id_shop`, `id_shop_group`)
 					VALUES (\''.$description.'\', \''.urlencode($task).'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\',
 						NULL, TRUE, TRUE, '.$id_shop.', '.$id_shop_group.')';
-				
+
 				return Db::getInstance()->execute($query);
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -425,7 +426,7 @@ class CronJobs extends PaymentModule
 			{
 				$id_shop = (int)Context::getContext()->shop->id;
 				$id_shop_group = (int)Context::getContext()->shop->id_shop_group;
-				
+
 				$query = 'INSERT INTO '._DB_PREFIX_.$this->name.'
 					(`description`, `task`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `active`, `id_shop`, `id_shop_group`)
 					VALUES (\''.$description.'\', \''.$task.'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\', NULL, TRUE, '.$id_shop.', '.$id_shop_group.')';
@@ -457,7 +458,7 @@ class CronJobs extends PaymentModule
 		$day_of_week = (int)Tools::getValue('day_of_week');
 
 		$id_cronjob = (int)Tools::getValue('id_cronjob');
-				
+
 		$id_shop = (int)Context::getContext()->shop->id;
 		$id_shop_group = (int)Context::getContext()->shop->id_shop_group;
 
@@ -475,27 +476,27 @@ class CronJobs extends PaymentModule
 
 		return $this->setErrorMessage('The task has not been updated');
 	}
-	
+
 	public function addNewModulesTasks()
 	{
 		$id_shop = (int)Context::getContext()->shop->id;
 		$id_shop_group = (int)Context::getContext()->shop->id_shop_group;
-		
+
 		$crons = Hook::getHookModuleExecList('actionCronJob');
-		
+
 		if ($crons == false)
 			return false;
-		
+
 		foreach ($crons as $cron)
 		{
 			$module = Module::getInstanceById((int)$cron['id_module']);
-			
+
 			if ($module == false)
 			{
 				Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.$this->name.' WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'');
 				break;
 			}
-			
+
 			$id_module = (int)$cron['id_module'];
 			$id_cronjob = (int)Db::getInstance()->getValue('SELECT `id_cronjob` FROM `'._DB_PREFIX_.$this->name.'`
 				WHERE `id_module` = \''.$id_module.'\' AND `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
@@ -555,13 +556,13 @@ class CronJobs extends PaymentModule
 			$day = Tools::getValue('day');
 			$month = Tools::getValue('month');
 			$day_of_week = Tools::getValue('day_of_week');
-			
+
 			return $this->isFrequencyValid($hour, $day, $month, $day_of_week);
 		}
 
 		return false;
 	}
-	
+
 	protected function isFrequencyValid($hour, $day, $month, $day_of_week)
 	{
 		$success = true;
@@ -577,14 +578,14 @@ class CronJobs extends PaymentModule
 
 		return $success;
 	}
-	
+
 	protected static function isTaskURLValid($task)
 	{
 		$task = urlencode($task);
 
 		if (strpos($task, urlencode(Tools::getShopDomain(true, true).__PS_BASE_URI__)) !== 0)
 			return $this->setErrorMessage('The target link you entered is not valid. It should be an absolute URL, on the same domain as your shop.');
-		
+
 		return true;
 	}
 
@@ -612,9 +613,9 @@ class CronJobs extends PaymentModule
 			$cron_mode = 'webservice';
 		else
 			$cron_mode = Tools::getValue('cron_mode', 'webservice');
-		
+
 		$link = new Link();
-		
+
 		Configuration::updateValue('CRONJOBS_MODE', $cron_mode);
 		$admin_folder = str_replace(_PS_ROOT_DIR_.'/', null, _PS_ADMIN_DIR_);
 		$path = Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.$admin_folder;
@@ -672,18 +673,18 @@ class CronJobs extends PaymentModule
 			.'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name
 			.'&token='.Tools::getAdminTokenLite('AdminModules'));
 	}
-	
+
 	protected function registerModuleHook($id_module)
 	{
 		$id_shop = (int)Context::getContext()->shop->id;
 		$id_shop_group = (int)Context::getContext()->shop->id_shop_group;
-		
+
 		$module = Module::getInstanceById($id_module);
-				
+
 		if (is_callable(array($module, 'getCronFrequency')) == true)
 		{
 			$frequency = $module->getCronFrequency();
-		
+
 			$query = 'INSERT INTO '._DB_PREFIX_.$this->name.'
 				(`id_module`, `hour`, `day`, `month`, `day_of_week`, `active`, `id_shop`, `id_shop_group`)
 				VALUES (\''.$id_module.'\', \''.$frequency['hour'].'\', \''.$frequency['day'].'\',
@@ -694,10 +695,10 @@ class CronJobs extends PaymentModule
 			$query = 'INSERT INTO '._DB_PREFIX_.$this->name.'
 				(`id_module`, `active`, `id_shop`, `id_shop_group`)
 				VALUES ('.$id_module.', FALSE, '.$id_shop.', '.$id_shop_group.')';
-			
+
 		return Db::getInstance()->execute($query);
 	}
-	
+
 	protected function unregisterModuleHook($id_module)
 	{
 		return Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.$this->name.' WHERE `id_module` = \''.(int)$id_module.'\'');
