@@ -187,7 +187,8 @@ class CronJobs extends PaymentModule
 
 	public function hookBackOfficeHeader()
 	{
-		$this->context->controller->addCSS($this->_path.'css/configure.css');
+		if (Tools::getValue('configure') == $this->name)
+			$this->context->controller->addCSS($this->_path.'css/configure.css');
 	}
 
 	public function getContent()
