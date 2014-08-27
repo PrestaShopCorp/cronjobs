@@ -46,7 +46,7 @@ class CronJobs extends PaymentModule
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.0.8';
+		$this->version = '1.0.9';
 		$this->module_key = '';
 
 		$this->currencies = true;
@@ -61,8 +61,6 @@ class CronJobs extends PaymentModule
 
 		$this->displayName = $this->l('Cron jobs');
 		$this->description = $this->l('Manage all your automated web tasks from a single interface.');
-
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 
 		if (function_exists('curl_init') == false)
 			$this->warning = $this->l('To be able to use this module, please activate cURL (PHP extension).');
@@ -188,7 +186,15 @@ class CronJobs extends PaymentModule
 	public function hookBackOfficeHeader()
 	{
 		if (Tools::getValue('configure') == $this->name)
-			$this->context->controller->addCSS($this->_path.'css/configure.css');
+		{
+			if (version_compare(_PS_VERSION_, '1.6', '<') == true)
+			{
+				$this->context->controller->addCSS($this->_path.'css/bootstrap.min.css');
+				$this->context->controller->addCSS($this->_path.'css/configure-ps-15.css');
+			}
+			else
+				$this->context->controller->addCSS($this->_path.'css/configure-ps-16.css');
+		}
 	}
 
 	public function getContent()
@@ -550,8 +556,8 @@ class CronJobs extends PaymentModule
 			(Tools::isSubmit('month') == true) &&
 			(Tools::isSubmit('day_of_week') == true))
 		{
-			if ($this->isTaskURLValid(Tools::getValue('task')) == false)
-				return false;
+			if (self::isTaskURLValid(Tools::getValue('task')) == false)
+				return $this->setErrorMessage('The target link you entered is not valid. It should be an absolute URL, on the same domain as your shop.');
 
 			$hour = Tools::getValue('hour');
 			$day = Tools::getValue('day');
@@ -585,7 +591,7 @@ class CronJobs extends PaymentModule
 		$task = urlencode($task);
 
 		if (strpos($task, urlencode(Tools::getShopDomain(true, true).__PS_BASE_URI__)) !== 0)
-			return $this->setErrorMessage('The target link you entered is not valid. It should be an absolute URL, on the same domain as your shop.');
+			return false;
 
 		return true;
 	}
