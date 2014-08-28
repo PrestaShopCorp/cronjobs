@@ -30,16 +30,16 @@ if (!defined('_PS_VERSION_'))
 class CronJobsForms
 {
 	protected static $module = false;
-	
+
 	public static function init($module)
 	{
 		if (self::$module == false)
 			self::$module = $module;
-		
+
 		return self::$module;
 	}
-	
-	public static function getJobForm($title = 'New cron job', $update = false)
+
+	public static function getJobForm($title = 'New cron task', $update = false)
 	{
 		$form = array(
 			array(
@@ -53,7 +53,7 @@ class CronJobsForms
 				),
 			),
 		);
-				
+
 		$id_shop = (int)Context::getContext()->shop->id;
 		$id_shop_group = (int)Context::getContext()->shop->id_shop_group;
 
@@ -75,7 +75,7 @@ class CronJobsForms
 					'label' => self::$module->l('Description'),
 					'placeholder' => self::$module->l('Update my currencies'),
 				);
-				
+
 				$form[0]['form']['input'][] = array(
 					'type' => 'free',
 					'name' => 'task',
@@ -96,7 +96,7 @@ class CronJobsForms
 					'type' => 'text',
 					'name' => 'task',
 					'label' => self::$module->l('Target link'),
-					'desc' => self::$module->l('Set the link of your cron job.'),
+					'desc' => self::$module->l('Set the link of your cron task.'),
 					'placeholder' => $currencies_cron_url,
 				);
 			}
@@ -172,9 +172,9 @@ class CronJobsForms
 						'label' => self::$module->l('Cron mode'),
 						'values' => array(
 							array('id' => 'webservice', 'value' => 'webservice', 'label' => self::$module->l('Basic'),
-								'p' => self::$module->l('Use the PrestaShop cron jobs webservice to execute your tasks.')),
+								'p' => self::$module->l('Use the PrestaShop cron tasks webservice to execute your tasks.')),
 							array('id' => 'advanced', 'value' => 'advanced', 'label' => self::$module->l('Advanced'),
-								'p' => self::$module->l('For advanced users only: use your own crontab manager instead of PrestaShop webcron service.'))
+								'p' => self::$module->l('For advanced users only: use your own crontab manager instead of PrestaShop cron tasks service.'))
 						),
 					),
 				),
@@ -201,9 +201,9 @@ class CronJobsForms
 			'advanced_help' =>
 				'<div class="alert alert-info">
 					<p>'
-						.self::$module->l('The Advanced mode enables you to use your own crontab file instead of PrestaShop webcron service.').' '
+						.self::$module->l('The Advanced mode enables you to use your own cron tasks manager instead of PrestaShop cron tasks webservice.').' '
 						.self::$module->l('First of all, make sure the \'curl\' library is installed on your server.')
-						.'<br />'.self::$module->l('To execute your cron jobs, please insert the following line in your crontab manager:').'
+						.'<br />'.self::$module->l('To execute your cron tasks, please insert the following line in your cron tasks manager:').'
 					</p>
 					<br />
 					<ul class="list-unstyled">
@@ -244,7 +244,7 @@ class CronJobsForms
 	{
 		$id_shop = (int)Context::getContext()->shop->id;
 		$id_shop_group = (int)Context::getContext()->shop->id_shop_group;
-		
+
 		$id_cronjob = (int)Tools::getValue('id_cronjob');
 		$cron = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.self::$module->name.'`
 			WHERE `id_cronjob` = \''.$id_cronjob.'\'
@@ -276,7 +276,7 @@ class CronJobsForms
 	{
 		$id_shop = (int)Context::getContext()->shop->id;
 		$id_shop_group = (int)Context::getContext()->shop->id_shop_group;
-		
+
 		self::$module->addNewModulesTasks();
 		$crons = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.self::$module->name.'` WHERE `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
 
@@ -285,17 +285,17 @@ class CronJobsForms
 			if (empty($cron['id_module']) == false)
 			{
 				$module = Module::getInstanceById((int)$cron['id_module']);
-				
+
 				if ($module == false)
 				{
 					Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.self::$module->name.' WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'');
 					unset($crons[$key]);
 					break;
 				}
-				
+
 				$query = 'SELECT `name` FROM `'._DB_PREFIX_.'module` WHERE `id_module` = \''.(int)$cron['id_module'].'\'';
 				$module_name = Db::getInstance()->getValue($query);
-			
+
 				$cron['description'] = Tools::safeOutput(Module::getModuleName($module_name));
 				$cron['task'] = self::$module->l('Module - Hook');
 			}
@@ -310,7 +310,7 @@ class CronJobsForms
 			$cron['one_shot'] = (bool)$cron['one_shot'];
 			$cron['active'] = (bool)$cron['active'];
 		}
-		
+
 		return $crons;
 	}
 

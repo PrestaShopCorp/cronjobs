@@ -59,7 +59,7 @@ class CronJobs extends PaymentModule
 
 		parent::__construct();
 
-		$this->displayName = $this->l('Cron jobs');
+		$this->displayName = $this->l('Cron tasks manager');
 		$this->description = $this->l('Manage all your automated web tasks from a single interface.');
 
 		if (function_exists('curl_init') == false)
@@ -231,7 +231,7 @@ class CronJobs extends PaymentModule
 			$output = $output.$this->renderForm(CronJobsForms::getJobForm(), CronJobsForms::getNewJobFormValues(), 'submitNewCronJob', true, $back_url);
 		elseif (Tools::isSubmit('updatecronjobs') && Tools::isSubmit('id_cronjob'))
 		{
-			$form_structure = CronJobsForms::getJobForm('Update cron job', true);
+			$form_structure = CronJobsForms::getJobForm('Update cron task', true);
 			$form = $this->renderForm($form_structure, CronJobsForms::getUpdateJobFormValues(), 'submitUpdateCronJob', true, $back_url, true);
 			$output = $output.$form;
 		}
@@ -329,7 +329,7 @@ class CronJobs extends PaymentModule
 		$local_ips = array('127.0.0.1', '::1');
 
 		if (in_array(Tools::getRemoteAddr(), $local_ips) == true)
-			$this->setWarningMessage('You are using the Cronjobs module on a local installation:
+			$this->setWarningMessage('You are using the Cron jobs module on a local installation:
 			you will not be able to use the Basic mode or reliably call remote cron tasks in your current environment.
 			To use this module at its best, you should switch to an online installation.');
 	}
@@ -649,7 +649,7 @@ class CronJobs extends PaymentModule
 		Configuration::updateValue('CRONJOBS_WEBSERVICE_ID', (int)$result);
 
 		if (((Tools::isSubmit('install') == false) && (Tools::isSubmit('reset') == false)) && ((bool)$result == false))
-			return $this->setErrorMessage('An error occurred while trying to contact PrestaShop\'s webcron service.');
+			return $this->setErrorMessage('An error occurred while trying to contact PrestaShop\'s cron tasks webservice.');
 		elseif (((Tools::isSubmit('install') == true) || (Tools::isSubmit('reset') == true)) && ((bool)$result == false))
 			return true;
 
@@ -658,9 +658,9 @@ class CronJobs extends PaymentModule
 		switch ($cron_mode)
 		{
 			case 'advanced':
-				return $this->setSuccessMessage('Your cron jobs have been successfully registered using the Advanced mode.');
+				return $this->setSuccessMessage('Your cron tasks have been successfully registered using the Advanced mode.');
 			case 'webservice':
-				return $this->setSuccessMessage('Your cron jobs have been successfully added to PrestaShop\'s webcrons service.');
+				return $this->setSuccessMessage('Your cron tasks have been successfully added to PrestaShop\'s cron tasks webservice.');
 			default:
 				return;
 		}
