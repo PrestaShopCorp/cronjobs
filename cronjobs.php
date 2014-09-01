@@ -46,7 +46,7 @@ class CronJobs extends PaymentModule
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.0.9';
+		$this->version = '1.1.0';
 		$this->module_key = '';
 
 		$this->currencies = true;
