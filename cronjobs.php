@@ -46,7 +46,7 @@ class CronJobs extends PaymentModule
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.1.0';
+		$this->version = '1.1.1';
 		$this->module_key = '';
 
 		$this->currencies = true;
@@ -227,6 +227,8 @@ class CronJobs extends PaymentModule
 				.'&token='.Tools::getAdminTokenLite('AdminModules');
 		}
 
+		$output = $output.$this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
+
 		if (Tools::isSubmit('newcronjobs') || ((isset($submit_cron) == true) && ($submit_cron === false)))
 			$output = $output.$this->renderForm(CronJobsForms::getJobForm(), CronJobsForms::getNewJobFormValues(), 'submitNewCronJob', true, $back_url);
 		elseif (Tools::isSubmit('updatecronjobs') && Tools::isSubmit('id_cronjob'))
@@ -242,10 +244,7 @@ class CronJobs extends PaymentModule
 		elseif (Tools::isSubmit('statuscronjobs'))
 			$this->postProcessUpdateJobStatus();
 		elseif (defined('_PS_HOST_MODE_') == false)
-		{
-			$output = $output.$this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
 			$output = $output.$this->renderForm(CronJobsForms::getForm(), CronJobsForms::getFormValues(), 'submitCronJobs');
-		}
 
 		return $output.$this->renderTasksList();
 	}
