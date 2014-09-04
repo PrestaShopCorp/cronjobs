@@ -46,7 +46,7 @@ class CronJobs extends PaymentModule
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.1.1';
+		$this->version = '1.1.2';
 		$this->module_key = '';
 
 		$this->currencies = true;
@@ -589,7 +589,8 @@ class CronJobs extends PaymentModule
 	{
 		$task = urlencode($task);
 
-		if (strpos($task, urlencode(Tools::getShopDomain(true, true).__PS_BASE_URI__)) !== 0)
+		if ((strpos($task, urlencode(Tools::getShopDomain(true, true).__PS_BASE_URI__)) !== 0) &&
+			(strpos($task, urlencode(Tools::getShopDomainSsl(true, true).__PS_BASE_URI__)) !== 0))
 			return false;
 
 		return true;

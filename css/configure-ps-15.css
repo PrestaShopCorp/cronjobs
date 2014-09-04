@@ -25,6 +25,11 @@
 	background: #BDE5F8 !important;
 }
 
+.alert-success {
+	border: 1px solid #4F8A10 !important;
+	background: #DFF2BF !important;
+}
+
 .panel {
 	padding: 15px;
 	border: 1px solid #eee;
