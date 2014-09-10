@@ -46,8 +46,10 @@ class CronJobs extends PaymentModule
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.1.2';
+		$this->version = '1.1.3';
 		$this->module_key = '';
+
+		$this->controllers = array('callback');
 
 		$this->currencies = true;
 		$this->currencies_mode = 'checkbox';
@@ -77,11 +79,11 @@ class CronJobs extends PaymentModule
 		Configuration::updateValue('CRONJOBS_EXECUTION_TOKEN', $token, false, 0, 0);
 		Configuration::updateValue('CRONJOBS_ADMIN_DIR', Tools::encrypt(_PS_ADMIN_DIR_));
 
-		$this->toggleWebservice(true);
-
-		return $this->installDb() && $this->installTab() && parent::install() &&
-			$this->registerHook('actionModuleRegisterHookAfter') && $this->registerHook('actionModuleUnRegisterHookAfter') &&
-			$this->registerHook('backOfficeHeader');
+		return parent::install() && $this->installDb() && $this->installTab() &&
+			$this->registerHook('actionModuleRegisterHookAfter') &&
+			$this->registerHook('actionModuleUnRegisterHookAfter') &&
+			$this->registerHook('backOfficeHeader') &&
+			$this->toggleWebservice(true, true);
 	}
 
 	protected function init()
@@ -101,7 +103,10 @@ class CronJobs extends PaymentModule
 	{
 		Configuration::deleteByName('CRONJOBS_MODE');
 
-		return $this->uninstallDb() && $this->uninstallTab() && parent::uninstall();
+		return $this->toggleWebservice(true, false) &&
+			$this->uninstallDb() &&
+			$this->uninstallTab() &&
+			parent::uninstall();
 	}
 
 	public function installDb()
@@ -462,7 +467,6 @@ class CronJobs extends PaymentModule
 		$day = (int)Tools::getValue('day');
 		$month = (int)Tools::getValue('month');
 		$day_of_week = (int)Tools::getValue('day_of_week');
-
 		$id_cronjob = (int)Tools::getValue('id_cronjob');
 
 		$id_shop = (int)Context::getContext()->shop->id;
@@ -614,12 +618,15 @@ class CronJobs extends PaymentModule
 		return false;
 	}
 
-	protected function toggleWebservice($force_webservice = false)
+	protected function toggleWebservice($force_webservice = false, $active = true)
 	{
 		if ($force_webservice !== false)
 			$cron_mode = 'webservice';
 		else
+		{
 			$cron_mode = Tools::getValue('cron_mode', 'webservice');
+			$active = ($cron_mode == 'advanced') ? false : true;
+		}
 
 		$link = new Link();
 
@@ -631,15 +638,15 @@ class CronJobs extends PaymentModule
 		$webservice_id = Configuration::get('CRONJOBS_WEBSERVICE_ID') ? '/'.Configuration::get('CRONJOBS_WEBSERVICE_ID') : null;
 
 		$data = array(
-			'callback' => $link->getModuleLink('cronjobs', 'callback'),
+			'callback' => $link->getModuleLink($this->name, 'callback'),
 			'cronjob' => $cron_url.'&token='.Configuration::get('CRONJOBS_EXECUTION_TOKEN', null, 0, 0),
 			'cron_token' => Configuration::get('CRONJOBS_EXECUTION_TOKEN', null, 0, 0),
-			'active' => ($cron_mode == 'advanced') ? false : true,
+			'active' => (int)$active,
 		);
 
 		$context_options = array (
 			'http' => array(
-				'method' => $webservice_id ? 'PUT' : 'POST',
+				'method' => (is_null($webservice_id) == true) ? 'POST' : 'PUT',
 				'content' => http_build_query($data),
 			)
 		);
@@ -648,7 +655,7 @@ class CronJobs extends PaymentModule
 		$result = Tools::file_get_contents($this->webservice_url.$webservice_id, false, $context);
 		Configuration::updateValue('CRONJOBS_WEBSERVICE_ID', (int)$result);
 
-		if (((Tools::isSubmit('install') == false) && (Tools::isSubmit('reset') == false)) && ((bool)$result == false))
+		if (((Tools::isSubmit('install') == false) || (Tools::isSubmit('reset') == false)) && ((bool)$result == false))
 			return $this->setErrorMessage('An error occurred while trying to contact PrestaShop\'s cron tasks webservice.');
 		elseif (((Tools::isSubmit('install') == true) || (Tools::isSubmit('reset') == true)) && ((bool)$result == false))
 			return true;
@@ -664,6 +671,8 @@ class CronJobs extends PaymentModule
 			default:
 				return;
 		}
+
+		return true;
 	}
 
 	protected function postProcessDeleteCronJob($id_cronjob)
