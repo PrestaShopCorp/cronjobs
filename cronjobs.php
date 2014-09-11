@@ -46,7 +46,7 @@ class CronJobs extends PaymentModule
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.1.4';
+		$this->version = '1.1.5';
 		$this->module_key = '';
 
 		$this->controllers = array('callback');

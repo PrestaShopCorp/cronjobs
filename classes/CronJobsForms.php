@@ -124,6 +124,7 @@ class CronJobsForms
 			'type' => 'select',
 			'name' => 'hour',
 			'label' => self::$module->l('Frequency'),
+			'desc' => self::$module->l('At what time should this task be executed ?'),
 			'options' => array(
 				'query' => self::getHoursFormOptions(),
 				'id' => 'id', 'name' => 'name'
@@ -132,6 +133,7 @@ class CronJobsForms
 		$form[0]['form']['input'][] = array(
 			'type' => 'select',
 			'name' => 'day',
+			'desc' => self::$module->l('On which day of the month should this task be executed ?'),
 			'options' => array(
 				'query' => self::getDaysFormOptions(),
 				'id' => 'id', 'name' => 'name'
@@ -140,6 +142,7 @@ class CronJobsForms
 		$form[0]['form']['input'][] = array(
 			'type' => 'select',
 			'name' => 'month',
+			'desc' => self::$module->l('On what month should this task be executed ?'),
 			'options' => array(
 				'query' => self::getMonthsFormOptions(),
 				'id' => 'id', 'name' => 'name'
@@ -148,6 +151,7 @@ class CronJobsForms
 		$form[0]['form']['input'][] = array(
 			'type' => 'select',
 			'name' => 'day_of_week',
+			'desc' => self::$module->l('On which day of the week should this task be executed ?'),
 			'options' => array(
 				'query' => self::getDaysofWeekFormOptions(),
 				'id' => 'id', 'name' => 'name'
@@ -316,7 +320,7 @@ class CronJobsForms
 
 	protected static function getHoursFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => self::$module->l('Hourly (on the hour)')));
+		$data = array(array('id' => '-1', 'name' => self::$module->l('Every hour')));
 
 		for ($hour = 0; $hour < 24; $hour += 1)
 			$data[] = array('id' => $hour, 'name' => date('H:i', mktime($hour, 0, 0, 0, 1)));
@@ -326,7 +330,7 @@ class CronJobsForms
 
 	protected static function getDaysFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => self::$module->l('Daily')));
+		$data = array(array('id' => '-1', 'name' => self::$module->l('Every day of the month')));
 
 		for ($day = 1; $day <= 31; $day += 1)
 			$data[] = array('id' => $day, 'name' => $day);
@@ -336,7 +340,7 @@ class CronJobsForms
 
 	protected static function getMonthsFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => self::$module->l('Monthly')));
+		$data = array(array('id' => '-1', 'name' => self::$module->l('Every month')));
 
 		for ($month = 1; $month <= 12; $month += 1)
 			$data[] = array('id' => $month, 'name' => self::$module->l(date('F', mktime(0, 0, 0, $month, 1))));
