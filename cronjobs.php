@@ -46,7 +46,7 @@ class CronJobs extends PaymentModule
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.1.3';
+		$this->version = '1.1.4';
 		$this->module_key = '';
 
 		$this->controllers = array('callback');
@@ -79,11 +79,15 @@ class CronJobs extends PaymentModule
 		Configuration::updateValue('CRONJOBS_EXECUTION_TOKEN', $token, false, 0, 0);
 		Configuration::updateValue('CRONJOBS_ADMIN_DIR', Tools::encrypt(_PS_ADMIN_DIR_));
 
-		return parent::install() && $this->installDb() && $this->installTab() &&
-			$this->registerHook('actionModuleRegisterHookAfter') &&
-			$this->registerHook('actionModuleUnRegisterHookAfter') &&
-			$this->registerHook('backOfficeHeader') &&
+		if (parent::install())
+		{
 			$this->toggleWebservice(true, true);
+			return $this->installDb() && $this->installTab() &&
+				$this->registerHook('actionModuleRegisterHookAfter') &&
+				$this->registerHook('actionModuleUnRegisterHookAfter') &&
+				$this->registerHook('backOfficeHeader');
+		}
+		return false;
 	}
 
 	protected function init()
