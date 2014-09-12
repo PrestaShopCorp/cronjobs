@@ -46,7 +46,7 @@ class CronJobs extends PaymentModule
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.1.5';
+		$this->version = '1.1.6';
 		$this->module_key = '';
 
 		$this->controllers = array('callback');
@@ -334,12 +334,17 @@ class CronJobs extends PaymentModule
 
 	protected function checkLocalEnvironment()
 	{
-		$local_ips = array('127.0.0.1', '::1');
-
-		if (in_array(Tools::getRemoteAddr(), $local_ips) == true)
+		if ($this->isLocalEnvironment() == true)
 			$this->setWarningMessage('You are using the Cron jobs module on a local installation:
 			you will not be able to use the Basic mode or reliably call remote cron tasks in your current environment.
 			To use this module at its best, you should switch to an online installation.');
+	}
+
+	protected function isLocalEnvironment()
+	{
+		$local_ips = array('127.0.0.1', '::1');
+
+		return in_array(Tools::getRemoteAddr(), $local_ips);
 	}
 
 	protected function renderForm($form, $form_values, $action, $cancel = false, $back_url = false, $update = false)
@@ -659,7 +664,9 @@ class CronJobs extends PaymentModule
 		$result = Tools::file_get_contents($this->webservice_url.$webservice_id, false, $context);
 		Configuration::updateValue('CRONJOBS_WEBSERVICE_ID', (int)$result);
 
-		if (((Tools::isSubmit('install') == false) || (Tools::isSubmit('reset') == false)) && ((bool)$result == false))
+		if ($this->isLocalEnvironment() == true)
+			return true;
+		elseif (((Tools::isSubmit('install') == false) || (Tools::isSubmit('reset') == false)) && ((bool)$result == false))
 			return $this->setErrorMessage('An error occurred while trying to contact PrestaShop\'s cron tasks webservice.');
 		elseif (((Tools::isSubmit('install') == true) || (Tools::isSubmit('reset') == true)) && ((bool)$result == false))
 			return true;
