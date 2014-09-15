@@ -46,7 +46,7 @@ class CronJobs extends PaymentModule
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.1.6';
+		$this->version = '1.1.7';
 		$this->module_key = '';
 
 		$this->controllers = array('callback');
@@ -342,6 +342,9 @@ class CronJobs extends PaymentModule
 
 	protected function isLocalEnvironment()
 	{
+		if (isset($_SERVER['REMOTE_ADDR']) === false)
+			return true;
+
 		$local_ips = array('127.0.0.1', '::1');
 
 		return in_array(Tools::getRemoteAddr(), $local_ips);
