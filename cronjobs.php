@@ -36,7 +36,6 @@ class CronJobs extends PaymentModule
 {
 	const EACH = -1;
 
-	protected $_errors;
 	protected $_successes;
 	protected $_warnings;
 
