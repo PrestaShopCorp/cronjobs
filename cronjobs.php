@@ -106,8 +106,9 @@ class CronJobs extends PaymentModule
 	{
 		Configuration::deleteByName('CRONJOBS_MODE');
 
-		return $this->toggleWebservice(true, false) &&
-			$this->uninstallDb() &&
+		$this->toggleWebservice(true, false);
+
+		return	$this->uninstallDb() &&
 			$this->uninstallTab() &&
 			parent::uninstall();
 	}
