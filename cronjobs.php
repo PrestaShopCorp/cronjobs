@@ -36,7 +36,6 @@ class CronJobs extends PaymentModule
 {
 	const EACH = -1;
 
-	protected $_errors;
 	protected $_successes;
 	protected $_warnings;
 
@@ -113,9 +112,10 @@ class CronJobs extends PaymentModule
 	public function uninstall()
 	{
 		Configuration::deleteByName('CRONJOBS_MODE');
+		
+		$this->toggleWebservice(true, false);
 
-		return $this->disableWebservice() &&
-			$this->uninstallDb() &&
+		return	$this->uninstallDb() &&
 			$this->uninstallTab() &&
 			parent::uninstall();
 	}
