@@ -45,7 +45,7 @@ class CronJobs extends PaymentModule
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.2.1';
+		$this->version = '1.2.2';
 		$this->module_key = '';
 
 		$this->controllers = array('callback');
@@ -112,8 +112,8 @@ class CronJobs extends PaymentModule
 	public function uninstall()
 	{
 		Configuration::deleteByName('CRONJOBS_MODE');
-		
-		$this->toggleWebservice(true, false);
+
+		$this->disableWebservice();
 
 		return	$this->uninstallDb() &&
 			$this->uninstallTab() &&
