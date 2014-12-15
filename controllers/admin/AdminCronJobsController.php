@@ -42,9 +42,6 @@ class AdminCronJobsController extends ModuleAdminController
 	{
 		$this->module->sendCallback();
 
-		if (Configuration::get('CRONJOBS_MODE') != 'webservice')
-			die;
-
 		ob_start();
 
 		$this->runModulesCrons();
