@@ -72,7 +72,7 @@ class CronJobsForms
 				$form[0]['form']['input'][] = array(
 					'type' => 'free',
 					'name' => 'description',
-					'label' => self::$module->l('Description'),
+					'label' => self::$module->l('Task description'),
 					'placeholder' => self::$module->l('Update my currencies'),
 				);
 
@@ -87,7 +87,7 @@ class CronJobsForms
 				$form[0]['form']['input'][] = array(
 					'type' => 'text',
 					'name' => 'description',
-					'label' => self::$module->l('Description'),
+					'label' => self::$module->l('Task description'),
 					'desc' => self::$module->l('Enter a description for this task.'),
 					'placeholder' => self::$module->l('Update my currencies'),
 				);
@@ -106,7 +106,7 @@ class CronJobsForms
 			$form[0]['form']['input'][] = array(
 				'type' => 'text',
 				'name' => 'description',
-				'label' => self::$module->l('Description'),
+				'label' => self::$module->l('Task description'),
 				'desc' => self::$module->l('Enter a description for this task.'),
 				'placeholder' => self::$module->l('Update my currencies'),
 			);
@@ -123,8 +123,8 @@ class CronJobsForms
 		$form[0]['form']['input'][] = array(
 			'type' => 'select',
 			'name' => 'hour',
-			'label' => self::$module->l('Frequency'),
-			'desc' => self::$module->l('At what time should this task be executed ?'),
+			'label' => self::$module->l('Task frequency'),
+			'desc' => self::$module->l('At what time should this task be executed?'),
 			'options' => array(
 				'query' => self::getHoursFormOptions(),
 				'id' => 'id', 'name' => 'name'
@@ -133,7 +133,7 @@ class CronJobsForms
 		$form[0]['form']['input'][] = array(
 			'type' => 'select',
 			'name' => 'day',
-			'desc' => self::$module->l('On which day of the month should this task be executed ?'),
+			'desc' => self::$module->l('On which day of the month should this task be executed?'),
 			'options' => array(
 				'query' => self::getDaysFormOptions(),
 				'id' => 'id', 'name' => 'name'
@@ -142,7 +142,7 @@ class CronJobsForms
 		$form[0]['form']['input'][] = array(
 			'type' => 'select',
 			'name' => 'month',
-			'desc' => self::$module->l('On what month should this task be executed ?'),
+			'desc' => self::$module->l('On what month should this task be executed?'),
 			'options' => array(
 				'query' => self::getMonthsFormOptions(),
 				'id' => 'id', 'name' => 'name'
@@ -151,7 +151,7 @@ class CronJobsForms
 		$form[0]['form']['input'][] = array(
 			'type' => 'select',
 			'name' => 'day_of_week',
-			'desc' => self::$module->l('On which day of the week should this task be executed ?'),
+			'desc' => self::$module->l('On which day of the week should this task be executed?'),
 			'options' => array(
 				'query' => self::getDaysofWeekFormOptions(),
 				'id' => 'id', 'name' => 'name'
@@ -220,7 +220,7 @@ class CronJobsForms
 	public static function getTasksList()
 	{
 		return array(
-			'description' => array('title' => self::$module->l('Description'), 'type' => 'text', 'orderby' => false),
+			'description' => array('title' => self::$module->l('Task description'), 'type' => 'text', 'orderby' => false),
 			'task' => array('title' => self::$module->l('Target link'), 'type' => 'text', 'orderby' => false),
 			'hour' => array('title' => self::$module->l('Hour'), 'type' => 'text', 'orderby' => false),
 			'day' => array('title' => self::$module->l('Day'), 'type' => 'text', 'orderby' => false),
