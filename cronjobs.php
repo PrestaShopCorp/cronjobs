@@ -32,7 +32,7 @@ if (defined('_PS_ADMIN_DIR_') === false)
 
 require_once(dirname(__FILE__).'/classes/CronJobsForms.php');
 
-class CronJobs extends PaymentModule
+class CronJobs extends Module
 {
 	const EACH = -1;
 
