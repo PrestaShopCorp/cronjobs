@@ -49,7 +49,7 @@ class CronJobsForms
 						'icon' => 'icon-plus',
 					),
 					'input' => array(),
-					'submit' => array('title' => self::$module->l('Save'), 'type' => 'submit', 'class' => 'btn btn-default pull-right'),
+					'submit' => array('title' => self::$module->l('Save', 'CronJobsForms'), 'type' => 'submit', 'class' => 'btn btn-default pull-right'),
 				),
 			),
 		);
@@ -72,14 +72,14 @@ class CronJobsForms
 				$form[0]['form']['input'][] = array(
 					'type' => 'free',
 					'name' => 'description',
-					'label' => self::$module->l('Task description'),
-					'placeholder' => self::$module->l('Update my currencies'),
+					'label' => self::$module->l('Task description', 'CronJobsForms'),
+					'placeholder' => self::$module->l('Update my currencies', 'CronJobsForms'),
 				);
 
 				$form[0]['form']['input'][] = array(
 					'type' => 'free',
 					'name' => 'task',
-					'label' => self::$module->l('Target link'),
+					'label' => self::$module->l('Target link', 'CronJobsForms'),
 				);
 			}
 			else
@@ -87,16 +87,16 @@ class CronJobsForms
 				$form[0]['form']['input'][] = array(
 					'type' => 'text',
 					'name' => 'description',
-					'label' => self::$module->l('Task description'),
-					'desc' => self::$module->l('Enter a description for this task.'),
-					'placeholder' => self::$module->l('Update my currencies'),
+					'label' => self::$module->l('Task description', 'CronJobsForms'),
+					'desc' => self::$module->l('Enter a description for this task.', 'CronJobsForms'),
+					'placeholder' => self::$module->l('Update my currencies', 'CronJobsForms'),
 				);
 
 				$form[0]['form']['input'][] = array(
 					'type' => 'text',
 					'name' => 'task',
-					'label' => self::$module->l('Target link'),
-					'desc' => self::$module->l('Set the link of your cron task.'),
+					'label' => self::$module->l('Target link', 'CronJobsForms'),
+					'desc' => self::$module->l('Set the link of your cron task.', 'CronJobsForms'),
 					'placeholder' => $currencies_cron_url,
 				);
 			}
@@ -106,16 +106,16 @@ class CronJobsForms
 			$form[0]['form']['input'][] = array(
 				'type' => 'text',
 				'name' => 'description',
-				'label' => self::$module->l('Task description'),
-				'desc' => self::$module->l('Enter a description for this task.'),
-				'placeholder' => self::$module->l('Update my currencies'),
+				'label' => self::$module->l('Task description', 'CronJobsForms'),
+				'desc' => self::$module->l('Enter a description for this task.', 'CronJobsForms'),
+				'placeholder' => self::$module->l('Update my currencies', 'CronJobsForms'),
 			);
 
 			$form[0]['form']['input'][] = array(
 				'type' => 'text',
 				'name' => 'task',
-				'label' => self::$module->l('Target link'),
-				'desc' => self::$module->l('Do not forget to use an absolute URL to make it valid! The link also has to be on the same domain as the shop.'),
+				'label' => self::$module->l('Target link', 'CronJobsForms'),
+				'desc' => self::$module->l('Do not forget to use an absolute URL to make it valid! The link also has to be on the same domain as the shop.', 'CronJobsForms'),
 				'placeholder' => $currencies_cron_url,
 			);
 		}
@@ -123,8 +123,8 @@ class CronJobsForms
 		$form[0]['form']['input'][] = array(
 			'type' => 'select',
 			'name' => 'hour',
-			'label' => self::$module->l('Task frequency'),
-			'desc' => self::$module->l('At what time should this task be executed?'),
+			'label' => self::$module->l('Task frequency', 'CronJobsForms'),
+			'desc' => self::$module->l('At what time should this task be executed?', 'CronJobsForms'),
 			'options' => array(
 				'query' => self::getHoursFormOptions(),
 				'id' => 'id', 'name' => 'name'
@@ -133,7 +133,7 @@ class CronJobsForms
 		$form[0]['form']['input'][] = array(
 			'type' => 'select',
 			'name' => 'day',
-			'desc' => self::$module->l('On which day of the month should this task be executed?'),
+			'desc' => self::$module->l('On which day of the month should this task be executed?', 'CronJobsForms'),
 			'options' => array(
 				'query' => self::getDaysFormOptions(),
 				'id' => 'id', 'name' => 'name'
@@ -142,7 +142,7 @@ class CronJobsForms
 		$form[0]['form']['input'][] = array(
 			'type' => 'select',
 			'name' => 'month',
-			'desc' => self::$module->l('On what month should this task be executed?'),
+			'desc' => self::$module->l('On what month should this task be executed?', 'CronJobsForms'),
 			'options' => array(
 				'query' => self::getMonthsFormOptions(),
 				'id' => 'id', 'name' => 'name'
@@ -151,7 +151,7 @@ class CronJobsForms
 		$form[0]['form']['input'][] = array(
 			'type' => 'select',
 			'name' => 'day_of_week',
-			'desc' => self::$module->l('On which day of the week should this task be executed?'),
+			'desc' => self::$module->l('On which day of the week should this task be executed?', 'CronJobsForms'),
 			'options' => array(
 				'query' => self::getDaysofWeekFormOptions(),
 				'id' => 'id', 'name' => 'name'
@@ -166,23 +166,23 @@ class CronJobsForms
 		$form = array(
 			'form' => array(
 				'legend' => array(
-					'title' => self::$module->l('Settings'),
+					'title' => self::$module->l('Settings', 'CronJobsForms'),
 					'icon' => 'icon-cog',
 				),
 				'input' => array(
 					array(
 						'type' => 'radio',
 						'name' => 'cron_mode',
-						'label' => self::$module->l('Cron mode'),
+						'label' => self::$module->l('Cron mode', 'CronJobsForms'),
 						'values' => array(
-							array('id' => 'webservice', 'value' => 'webservice', 'label' => self::$module->l('Basic'),
-								'p' => self::$module->l('Use the PrestaShop cron tasks webservice to execute your tasks.')),
-							array('id' => 'advanced', 'value' => 'advanced', 'label' => self::$module->l('Advanced'),
-								'p' => self::$module->l('For advanced users only: use your own crontab manager instead of PrestaShop cron tasks service.'))
+							array('id' => 'webservice', 'value' => 'webservice', 'label' => self::$module->l('Basic', 'CronJobsForms'),
+								'p' => self::$module->l('Use the PrestaShop cron tasks webservice to execute your tasks.', 'CronJobsForms')),
+							array('id' => 'advanced', 'value' => 'advanced', 'label' => self::$module->l('Advanced', 'CronJobsForms'),
+								'p' => self::$module->l('For advanced users only: use your own crontab manager instead of PrestaShop cron tasks service.', 'CronJobsForms'))
 						),
 					),
 				),
-				'submit' => array('title' => self::$module->l('Save'), 'type' => 'submit', 'class' => 'btn btn-default pull-right'),
+				'submit' => array('title' => self::$module->l('Save', 'CronJobsForms'), 'type' => 'submit', 'class' => 'btn btn-default pull-right'),
 			),
 		);
 
@@ -205,9 +205,9 @@ class CronJobsForms
 			'advanced_help' =>
 				'<div class="alert alert-info">
 					<p>'
-						.self::$module->l('The Advanced mode enables you to use your own cron tasks manager instead of PrestaShop cron tasks webservice.').' '
-						.self::$module->l('First of all, make sure the \'curl\' library is installed on your server.')
-						.'<br />'.self::$module->l('To execute your cron tasks, please insert the following line in your cron tasks manager:').'
+						.self::$module->l('The Advanced mode enables you to use your own cron tasks manager instead of PrestaShop cron tasks webservice.', 'CronJobsForms').' '
+						.self::$module->l('First of all, make sure the \'curl\' library is installed on your server.', 'CronJobsForms')
+						.'<br />'.self::$module->l('To execute your cron tasks, please insert the following line in your cron tasks manager:', 'CronJobsForms').'
 					</p>
 					<br />
 					<ul class="list-unstyled">
@@ -220,15 +220,15 @@ class CronJobsForms
 	public static function getTasksList()
 	{
 		return array(
-			'description' => array('title' => self::$module->l('Task description'), 'type' => 'text', 'orderby' => false),
-			'task' => array('title' => self::$module->l('Target link'), 'type' => 'text', 'orderby' => false),
-			'hour' => array('title' => self::$module->l('Hour'), 'type' => 'text', 'orderby' => false),
-			'day' => array('title' => self::$module->l('Day'), 'type' => 'text', 'orderby' => false),
-			'month' => array('title' => self::$module->l('Month'), 'type' => 'text', 'orderby' => false),
-			'day_of_week' => array('title' => self::$module->l('Day of week'), 'type' => 'text', 'orderby' => false),
-			'updated_at' => array('title' => self::$module->l('Last execution'), 'type' => 'text', 'orderby' => false),
-			'one_shot' => array('title' => self::$module->l('One shot'), 'active' => 'oneshot', 'type' => 'bool', 'align' => 'center'),
-			'active' => array('title' => self::$module->l('Active'), 'active' => 'status', 'type' => 'bool', 'align' => 'center', 'orderby' => false),
+			'description' => array('title' => self::$module->l('Task description', 'CronJobsForms'), 'type' => 'text', 'orderby' => false),
+			'task' => array('title' => self::$module->l('Target link', 'CronJobsForms'), 'type' => 'text', 'orderby' => false),
+			'hour' => array('title' => self::$module->l('Hour', 'CronJobsForms'), 'type' => 'text', 'orderby' => false),
+			'day' => array('title' => self::$module->l('Day', 'CronJobsForms'), 'type' => 'text', 'orderby' => false),
+			'month' => array('title' => self::$module->l('Month', 'CronJobsForms'), 'type' => 'text', 'orderby' => false),
+			'day_of_week' => array('title' => self::$module->l('Day of week', 'CronJobsForms'), 'type' => 'text', 'orderby' => false),
+			'updated_at' => array('title' => self::$module->l('Last execution', 'CronJobsForms'), 'type' => 'text', 'orderby' => false),
+			'one_shot' => array('title' => self::$module->l('One shot', 'CronJobsForms'), 'active' => 'oneshot', 'type' => 'bool', 'align' => 'center'),
+			'active' => array('title' => self::$module->l('Active', 'CronJobsForms'), 'active' => 'status', 'type' => 'bool', 'align' => 'center', 'orderby' => false),
 		);
 	}
 
@@ -263,7 +263,7 @@ class CronJobsForms
 		{
 			$module_name = Db::getInstance()->getValue('SELECT `name` FROM `'._DB_PREFIX_.'module` WHERE `id_module` = \''.$id_cronjob.'\'');
 			$description = '<p class="form-control-static"><strong>'.Tools::safeOutput(Module::getModuleName($module_name)).'</strong></p>';
-			$task = '<p class="form-control-static"><strong>'.self::$module->l('Module - Hook').'</strong></p>';
+			$task = '<p class="form-control-static"><strong>'.self::$module->l('Module - Hook', 'CronJobsForms').'</strong></p>';
 		}
 
 		return array(
@@ -301,16 +301,16 @@ class CronJobsForms
 				$module_name = Db::getInstance()->getValue($query);
 
 				$cron['description'] = Tools::safeOutput(Module::getModuleName($module_name));
-				$cron['task'] = self::$module->l('Module - Hook');
+				$cron['task'] = self::$module->l('Module - Hook', 'CronJobsForms');
 			}
 			else
 				$cron['task'] = Tools::safeOutput(urldecode($cron['task']));
 
-			$cron['hour'] = ($cron['hour'] == -1) ? self::$module->l('Every hour') : date('H:i', mktime((int)$cron['hour'], 0, 0, 0, 1));
-			$cron['day'] = ($cron['day'] == -1) ? self::$module->l('Every day') : (int)$cron['day'];
-			$cron['month'] = ($cron['month'] == -1) ? self::$module->l('Every month') : self::$module->l(date('F', mktime(0, 0, 0, (int)$cron['month'], 1)));
-			$cron['day_of_week'] = ($cron['day_of_week'] == -1) ? self::$module->l('Every day of the week') : self::$module->l(date('l', mktime(0, 0, 0, 0, (int)$cron['day_of_week'])));
-			$cron['updated_at'] = ($cron['updated_at'] == 0) ? self::$module->l('Never') : date('Y-m-d H:i:s', strtotime($cron['updated_at']));
+			$cron['hour'] = ($cron['hour'] == -1) ? self::$module->l('Every hour', 'CronJobsForms') : date('H:i', mktime((int)$cron['hour'], 0, 0, 0, 1));
+			$cron['day'] = ($cron['day'] == -1) ? self::$module->l('Every day', 'CronJobsForms') : (int)$cron['day'];
+			$cron['month'] = ($cron['month'] == -1) ? self::$module->l('Every month', 'CronJobsForms') : self::$module->l(date('F', mktime(0, 0, 0, (int)$cron['month'], 1)));
+			$cron['day_of_week'] = ($cron['day_of_week'] == -1) ? self::$module->l('Every day of the week', 'CronJobsForms') : self::$module->l(date('l', mktime(0, 0, 0, 0, (int)$cron['day_of_week'])));
+			$cron['updated_at'] = ($cron['updated_at'] == 0) ? self::$module->l('Never', 'CronJobsForms') : date('Y-m-d H:i:s', strtotime($cron['updated_at']));
 			$cron['one_shot'] = (bool)$cron['one_shot'];
 			$cron['active'] = (bool)$cron['active'];
 		}
@@ -320,7 +320,7 @@ class CronJobsForms
 
 	protected static function getHoursFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => self::$module->l('Every hour')));
+		$data = array(array('id' => '-1', 'name' => self::$module->l('Every hour', 'CronJobsForms')));
 
 		for ($hour = 0; $hour < 24; $hour += 1)
 			$data[] = array('id' => $hour, 'name' => date('H:i', mktime($hour, 0, 0, 0, 1)));
@@ -330,7 +330,7 @@ class CronJobsForms
 
 	protected static function getDaysFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => self::$module->l('Every day of the month')));
+		$data = array(array('id' => '-1', 'name' => self::$module->l('Every day of the month', 'CronJobsForms')));
 
 		for ($day = 1; $day <= 31; $day += 1)
 			$data[] = array('id' => $day, 'name' => $day);
@@ -340,7 +340,7 @@ class CronJobsForms
 
 	protected static function getMonthsFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => self::$module->l('Every month')));
+		$data = array(array('id' => '-1', 'name' => self::$module->l('Every month', 'CronJobsForms')));
 
 		for ($month = 1; $month <= 12; $month += 1)
 			$data[] = array('id' => $month, 'name' => self::$module->l(date('F', mktime(0, 0, 0, $month, 1))));
@@ -350,7 +350,7 @@ class CronJobsForms
 
 	protected static function getDaysofWeekFormOptions()
 	{
-		$data = array(array('id' => '-1', 'name' => self::$module->l('Every day of the week')));
+		$data = array(array('id' => '-1', 'name' => self::$module->l('Every day of the week', 'CronJobsForms')));
 
 		for ($day = 1; $day <= 7; $day += 1)
 			$data[] = array('id' => $day, 'name' => self::$module->l(date('l', mktime(0, 0, 0, 0, $day))));
