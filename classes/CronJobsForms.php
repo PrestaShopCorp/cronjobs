@@ -261,7 +261,7 @@ class CronJobsForms
 		}
 		else
 		{
-			$module_name = Db::getInstance()->getValue('SELECT `name` FROM `'._DB_PREFIX_.'module` WHERE `id_module` = \''.$id_cronjob.'\'');
+			$module_name = Db::getInstance()->getValue('SELECT `name` FROM `'._DB_PREFIX_.'module` WHERE `id_module` = \''.(int)$cron['id_module'].'\'');
 			$description = '<p class="form-control-static"><strong>'.Tools::safeOutput(Module::getModuleName($module_name)).'</strong></p>';
 			$task = '<p class="form-control-static"><strong>'.self::$module->l('Module - Hook', 'CronJobsForms').'</strong></p>';
 		}
