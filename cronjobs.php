@@ -344,9 +344,7 @@ class CronJobs extends Module
 	protected function checkLocalEnvironment()
 	{
 		if ($this->isLocalEnvironment() == true)
-			$this->setWarningMessage('You are using the Cron jobs module on a local installation:
-				you will not be able to use the Basic mode or reliably call remote cron tasks in your current environment.
-				To use this module at its best, you should switch to an online installation.');
+			$this->setWarningMessage($this->l('You are using the Cron jobs module on a local installation: you will not be able to use the Basic mode or reliably call remote cron tasks in your current environment. To use this module at its best, you should switch to an online installation.'));
 	}
 
 	protected function isLocalEnvironment()
@@ -452,11 +450,11 @@ class CronJobs extends Module
 					VALUES (\''.$description.'\', \''.$task.'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\', NULL, TRUE, '.$id_shop.', '.$id_shop_group.')';
 
 				if (($result = Db::getInstance()->execute($query)) != false)
-					return $this->setSuccessMessage('The task has been successfully added.');
-				return $this->setErrorMessage('An error happened: the task could not be added.');
+					return $this->setSuccessMessage($this->l('The task has been successfully added.'));
+				return $this->setErrorMessage($this->l('An error happened: the task could not be added.'));
 			}
 
-			return $this->setErrorMessage('This cron task already exists.');
+			return $this->setErrorMessage($this->l('This cron task already exists.'));
 		}
 
 		return false;
@@ -488,8 +486,8 @@ class CronJobs extends Module
 			WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'';
 
 		if (($result = Db::getInstance()->execute($query)) != false)
-			return $this->setSuccessMessage('The task has been updated.');
-		return $this->setErrorMessage('The task has not been updated');
+			return $this->setSuccessMessage($this->l('The task has been updated.'));
+		return $this->setErrorMessage($this->l('The task has not been updated'));
 	}
 
 	public function addNewModulesTasks()
@@ -565,7 +563,7 @@ class CronJobs extends Module
 			(Tools::isSubmit('day_of_week') == true))
 		{
 			if (self::isTaskURLValid(Tools::getValue('task')) == false)
-				return $this->setErrorMessage('The target link you entered is not valid. It should be an absolute URL, on the same domain as your shop.');
+				return $this->setErrorMessage($this->l('The target link you entered is not valid. It should be an absolute URL, on the same domain as your shop.'));
 
 			$hour = Tools::getValue('hour');
 			$day = Tools::getValue('day');
@@ -583,13 +581,13 @@ class CronJobs extends Module
 		$success = true;
 
 		if ((($hour >= -1) && ($hour < 24)) == false)
-			$success &= $this->setErrorMessage('The value you chose for the hour is not valid. It should be between 00:00 and 23:59.');
+			$success &= $this->setErrorMessage($this->l('The value you chose for the hour is not valid. It should be between 00:00 and 23:59.'));
 		if ((($day >= -1) && ($day <= 31)) == false)
-			$success &= $this->setErrorMessage('The value you chose for the day is not valid.');
+			$success &= $this->setErrorMessage($this->l('The value you chose for the day is not valid.'));
 		if ((($month >= -1) && ($month <= 31)) == false)
-			$success &= $this->setErrorMessage('The value you chose for the month is not valid.');
+			$success &= $this->setErrorMessage($this->l('The value you chose for the month is not valid.'));
 		if ((($day_of_week >= -1) && ($day_of_week < 7)) == false)
-			$success &= $this->setErrorMessage('The value you chose for the day of the week is not valid.');
+			$success &= $this->setErrorMessage($this->l('The value you chose for the day of the week is not valid.'));
 
 		return $success;
 	}
@@ -665,13 +663,13 @@ class CronJobs extends Module
 		if (((Tools::isSubmit('install') == true) || (Tools::isSubmit('reset') == true)) && ((bool)$result == false))
 			return true;
 		elseif (((Tools::isSubmit('install') == false) || (Tools::isSubmit('reset') == false)) && ((bool)$result == false))
-			return $this->setErrorMessage('An error occurred while trying to contact PrestaShop\'s cron tasks webservice.');
+			return $this->setErrorMessage($this->l('An error occurred while trying to contact PrestaShop\'s cron tasks webservice.'));
 		elseif ($this->isLocalEnvironment() == true)
 			return true;
 
 		if ((bool)$use_webservice == true)
-			return $this->setSuccessMessage('Your cron tasks have been successfully added to PrestaShop\'s cron tasks webservice.');
-		return $this->setSuccessMessage('Your cron tasks have been successfully registered using the Advanced mode.');
+			return $this->setSuccessMessage($this->l('Your cron tasks have been successfully added to PrestaShop\'s cron tasks webservice.'));
+		return $this->setSuccessMessage($this->l('Your cron tasks have been successfully registered using the Advanced mode.'));
 	}
 
 	protected function postProcessDeleteCronJob($id_cronjob)
