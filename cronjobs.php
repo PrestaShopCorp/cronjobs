@@ -50,8 +50,6 @@ class CronJobs extends Module
 
 		$this->controllers = array('callback');
 
-		$this->currencies = true;
-		$this->currencies_mode = 'checkbox';
 		$this->author = 'PrestaShop';
 		$this->need_instance = true;
 
