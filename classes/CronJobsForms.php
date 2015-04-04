@@ -304,7 +304,7 @@ class CronJobsForms
 				$cron['task'] = self::$module->l('Module - Hook', 'CronJobsForms');
 			}
 			else
-				$cron['task'] = Tools::safeOutput(urldecode($cron['task']));
+				$cron['task'] = htmlspecialchars_decode(Tools::safeOutput(urldecode($cron['task'])));
 
 			$cron['hour'] = ($cron['hour'] == -1) ? self::$module->l('Every hour', 'CronJobsForms') : date('H:i', mktime((int)$cron['hour'], 0, 0, 0, 1));
 			$cron['day'] = ($cron['day'] == -1) ? self::$module->l('Every day', 'CronJobsForms') : (int)$cron['day'];
