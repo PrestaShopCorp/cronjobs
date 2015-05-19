@@ -277,6 +277,9 @@ class CronJobs extends Module
 		ob_end_flush();
 		ob_flush();
 		flush();
+
+		if (function_exists('fastcgi_finish_request'))
+			fastcgi_finish_request();
 	}
 
 	public static function isActive($id_module)
