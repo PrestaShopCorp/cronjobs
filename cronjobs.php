@@ -70,7 +70,7 @@ class CronJobs extends Module
 
 	public function install()
 	{
-		Configuration::updateValue('CRONJOBS_ADMIN_DIR', Tools::encrypt(_PS_ADMIN_DIR_));
+		Configuration::updateValue('CRONJOBS_ADMIN_DIR', Tools::encrypt($this->getAdminDir()));
 		Configuration::updateValue('CRONJOBS_MODE', 'webservice');
 		Configuration::updateValue('CRONJOBS_MODULE_VERSION', $this->version);
 		Configuration::updateValue('CRONJOBS_WEBSERVICE_ID', 0);
@@ -90,16 +90,21 @@ class CronJobs extends Module
 
 		return false;
 	}
+	
+	protected function getAdminDir()
+	{
+		return basename(_PS_ADMIN_DIR_);
+	}
 
 	protected function init()
 	{
-		$new_admin_dir = (Tools::encrypt(_PS_ADMIN_DIR_) != Configuration::get('CRONJOBS_ADMIN_DIR'));
+		$new_admin_dir = (Tools::encrypt($this->getAdminDir()) != Configuration::get('CRONJOBS_ADMIN_DIR'));
 		$new_module_version = version_compare($this->version, Configuration::get('CRONJOBS_MODULE_VERSION'), '!=');
 
 		if ($new_admin_dir || $new_module_version)
 		{
 			Configuration::updateValue('CRONJOBS_MODULE_VERSION', $this->version);
-			Configuration::updateValue('CRONJOBS_ADMIN_DIR', Tools::encrypt(_PS_ADMIN_DIR_));
+			Configuration::updateValue('CRONJOBS_ADMIN_DIR', Tools::encrypt($this->getAdminDir()));
 
 			if (Configuration::get('CRONJOBS_MODE') == 'webservice')
 				return $this->enableWebservice();
@@ -637,7 +642,7 @@ class CronJobs extends Module
 	protected function updateWebservice($use_webservice)
 	{
 		$link = new Link();
-		$admin_folder = rtrim(str_replace(_PS_ROOT_DIR_.'/', null, _PS_ADMIN_DIR_), '/');
+		$admin_folder = $this->getAdminDir();
 		$path = Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.$admin_folder;
 		$cron_url = $path.'/'.$link->getAdminLink('AdminCronJobs', false);
 
@@ -655,8 +660,6 @@ class CronJobs extends Module
 			'method' => (is_null($webservice_id) == true) ? 'POST' : 'PUT',
 			'content' => http_build_query($data)
 		));
-
-		// die(var_dump(_PS_ADMIN_DIR_, $admin_folder, $path, $cron_url, $this->webservice_url.$webservice_id, $context_options));
 
 		$result = Tools::file_get_contents($this->webservice_url.$webservice_id, false, stream_context_create($context_options));
 
