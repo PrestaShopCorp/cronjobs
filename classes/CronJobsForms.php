@@ -211,7 +211,7 @@ class CronJobsForms
 					</p>
 					<br />
 					<ul class="list-unstyled">
-						<li><code>0 * * * * curl "'.$curl_url.'"</code></li>
+						<li><code>0 * * * * curl '.(Configuration::get('PS_SSL_ENABLED') ? '-k ' : null).'"'.$curl_url.'"</code></li>
 					</ul>
 				</div>'
 		);

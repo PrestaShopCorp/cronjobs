@@ -45,7 +45,7 @@ class CronJobs extends Module
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.2.7';
+		$this->version = '1.2.8';
 		$this->module_key = '';
 
 		$this->controllers = array('callback');
@@ -90,7 +90,7 @@ class CronJobs extends Module
 
 		return false;
 	}
-	
+
 	protected function getAdminDir()
 	{
 		return basename(_PS_ADMIN_DIR_);
