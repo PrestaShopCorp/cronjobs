@@ -28,11 +28,25 @@ $_MODULE['<{cronjobs}prestashop>cronjobsforms_0eff773cf33456a033e913f6ed18045c']
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_07045abc579615634804f42bc0b2b4bb'] = 'Entrez une description pour cette tâche.';
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_43773e69610c99be6c15daa4a2036443'] = 'Définissez le lien de votre tâche cron.';
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_3a21e2309e8e6aa3759e466154508f2c'] = 'N\'oubliez pas d\'utiliser une URL absolue pour qu\'il soit valide ! Le lien doit également être sur le même domaine que la boutique.';
+<<<<<<< Updated upstream
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_be938fb8c5582085599dfa95368fb489'] = 'Fréquence de la tâche';
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_b3364fad867d47ca61265fd315e4071e'] = 'À quelle heure la tâche doit-elle être exécutée ?';
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_6c5d30049c4d8d644bd35650be4ac13a'] = 'Quel jour du mois doit-elle être exécutée ?';
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_a1457ee25ec20fa032d37509b5a90a4e'] = 'Quel mois doit-elle être exécutée ?';
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_65f768d204a3118f426c756056bef1e1'] = 'Quel jour de la semaine doit-elle être exécutée ?';
+||||||| merged common ancestors
+$_MODULE['<{cronjobs}prestashop>cronjobsforms_7cf395303ce3665a9834721d4b748e4b'] = 'Fréquence';
+$_MODULE['<{cronjobs}prestashop>cronjobsforms_582a4f7739cbd9601d6c3b5468c6d140'] = 'A quel moment cette tâche doit-elle être exécutée ?';
+$_MODULE['<{cronjobs}prestashop>cronjobsforms_f528bd8e57a7d662473bcc6e685e117b'] = 'Quel jour du mois cette tâche doit-elle être exécutée ?';
+$_MODULE['<{cronjobs}prestashop>cronjobsforms_f069c9d4732b0b59d44e81eb8aa8a500'] = 'Pendant quel mois cette tâche doit-elle être exécutée ?';
+$_MODULE['<{cronjobs}prestashop>cronjobsforms_07f0edf63c994360b5e4440e793c86a1'] = 'Quel jour de la semaine cette tâche doit-elle être exécutée ?';
+=======
+$_MODULE['<{cronjobs}prestashop>cronjobsforms_be938fb8c5582085599dfa95368fb489'] = 'Fréquence de la tâche';
+$_MODULE['<{cronjobs}prestashop>cronjobsforms_b3364fad867d47ca61265fd315e4071e'] = 'A quel moment cette tâche doit-elle être exécutée ?';
+$_MODULE['<{cronjobs}prestashop>cronjobsforms_6c5d30049c4d8d644bd35650be4ac13a'] = 'Quel jour du mois cette tâche doit-elle être exécutée ?';
+$_MODULE['<{cronjobs}prestashop>cronjobsforms_a1457ee25ec20fa032d37509b5a90a4e'] = 'Quel mois de l\'année cette tâche doit-elle être exécutée ?';
+$_MODULE['<{cronjobs}prestashop>cronjobsforms_65f768d204a3118f426c756056bef1e1'] = 'Quel jour de la semaine cette tâche doit-elle être exécutée ?';
+>>>>>>> Stashed changes
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_f4f70727dc34561dfde1a3c529b6205c'] = 'Paramètres';
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_b3419e63398ccc41c062f36631bebd9a'] = 'Mode cron';
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_972e73b7a882d0802a4e3a16946a2f94'] = 'Basique';
@@ -48,7 +62,7 @@ $_MODULE['<{cronjobs}prestashop>cronjobsforms_7cbb885aa1164b390a0bc050a64e1812']
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_e59278675b8f1e052b22b7e5e7d65da7'] = 'Jour de la semaine';
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_8cebfac3b4821cbc83041f5df54d7730'] = 'Dernière exécution';
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_1e3208e0b0d5de9281f88c34169cda6b'] = 'Exécution unique';
-$_MODULE['<{cronjobs}prestashop>cronjobsforms_4d3d769b812b6faa6b76e1a8abaece2d'] = 'Actif';
+$_MODULE['<{cronjobs}prestashop>cronjobsforms_4d3d769b812b6faa6b76e1a8abaece2d'] = 'Activé';
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_bdb6ae0d03e6793183349e00f67657f6'] = 'Module - Point d\'accroche';
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_02fd27d2951d00b83f111f63611ea863'] = 'Toutes les heures';
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_48bf14c419a1d441412510faf39c326d'] = 'Tous les jours';
@@ -58,7 +72,7 @@ $_MODULE['<{cronjobs}prestashop>cronjobsforms_6e7b34fa59e1bd229b207892956dc41c']
 $_MODULE['<{cronjobs}prestashop>cronjobsforms_16ed0a7b977ec3bbd23badfb5580d56f'] = 'Tous les jours du mois';
 $_MODULE['<{cronjobs}prestashop>configure_27c1f598c2b2b0a8e64424d257e8b398'] = 'Que fait ce module ?';
 $_MODULE['<{cronjobs}prestashop>configure_c22203a97c7dd88dd68d1e864d46ee0c'] = 'À l\'origine, cron est un outil du système Unix qui permet de planifier des tâches à un instant donné : vous pouvez créer de nombreuses tâches cron qui seront alors exécutées périodiquement à une heure, date ou intervalle fixé.';
-$_MODULE['<{cronjobs}prestashop>configure_d24ca73e026491b9610193f36d5edec8'] = 'Ce module vous fournit un outil cron : vous pouvez créer des tâches qui appelleront un ensemble d\'URL sécurisées sur votre boutique Prestashop, déclenchant ainsi des mises à jour et autres tâches automatisées.';
+$_MODULE['<{cronjobs}prestashop>configure_d24ca73e026491b9610193f36d5edec8'] = 'Ce module vous fournit un outil cron : vous pouvez créer des tâches qui appelleront un ensemble d\'URL sécurisées sur votre boutique PrestaShop, déclenchant ainsi des mises à jour et autres tâches automatisées.';
 $_MODULE['<{cronjobs}prestashop>task_b43ff85c4fc17955aa3ba90827d65430'] = 'N\'oubliez pas d\'utiliser une URL absolue dans le lien cible pour le rendre valide ! Le lien doit aussi être sur le même domaine que la boutique.';
 $_MODULE['<{cronjobs}prestashop>form_ef7bd68a02b6b5656554f7a27d1c7bdf'] = 'Erreur !';
 $_MODULE['<{cronjobs}prestashop>form_dc3fd488f03d423a04da27ce66274c1b'] = 'Attention !';

@@ -45,7 +45,7 @@ class CronJobs extends Module
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.3.0';
+		$this->version = '1.3.1';
 		$this->module_key = '';
 
 		$this->controllers = array('callback');
@@ -90,7 +90,7 @@ class CronJobs extends Module
 
 		return false;
 	}
-	
+
 	protected function getAdminDir()
 	{
 		return basename(_PS_ADMIN_DIR_);
@@ -328,12 +328,18 @@ class CronJobs extends Module
 		}
 		else
 		{
+			$is_frequency_valid = true;
 			$hour = (int)$execution['hour'];
 			$day = (int)$execution['day'];
 			$month = (int)$execution['month'];
 			$day_of_week = (int)$execution['day_of_week'];
 
-			if ($this->isFrequencyValid($hour, $day, $month, $day_of_week))
+			$is_frequency_valid = (($hour >= -1) && ($hour < 24) && $is_frequency_valid);
+			$is_frequency_valid = (($day >= -1) && ($day <= 31) && $is_frequency_valid);
+			$is_frequency_valid = (($month >= -1) && ($month <= 31) && $is_frequency_valid);
+			$is_frequency_valid = (($day_of_week >= -1) && ($day_of_week < 7) && $is_frequency_valid);
+
+			if ($is_frequency_valid == true)
 			{
 				$query = 'INSERT INTO '._DB_PREFIX_.'cronjobs
 					(`description`, `task`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `one_shot`, `active`, `id_shop`, `id_shop_group`)
