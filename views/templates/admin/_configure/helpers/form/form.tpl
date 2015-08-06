@@ -37,7 +37,7 @@
 			</ul>
 		</div>
 	{/if}
-	
+
 	{if (isset($form_infos)) && (count($form_infos) > 0)}
 		<div class="alert alert-warning">
 			<h4>{l s='Warning!' mod='cronjobs'}</h4>
@@ -48,7 +48,7 @@
 			</ul>
 		</div>
 	{/if}
-	
+
 	{if (isset($form_successes)) && (count($form_successes) > 0)}
 		<div class="alert alert-success">
 			<h4>{l s='Success!' mod='cronjobs'}</h4>

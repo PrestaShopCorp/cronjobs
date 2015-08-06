@@ -211,7 +211,7 @@ class CronJobsForms
 					</p>
 					<br />
 					<ul class="list-unstyled">
-						<li><code>0 * * * * curl "'.$curl_url.'"</code></li>
+						<li><code>0 * * * * curl '.(Configuration::get('PS_SSL_ENABLED') ? '-k ' : null).'"'.$curl_url.'"</code></li>
 					</ul>
 				</div>'
 		);
@@ -257,7 +257,7 @@ class CronJobsForms
 		if ((bool)$cron['id_module'] == false)
 		{
 			$description = Tools::safeOutput(Tools::getValue('description', $cron['description']));
-			$task = Tools::safeOutput(urldecode(Tools::getValue('task', $cron['task'])));
+			$task = urldecode(Tools::getValue('task', $cron['task']));
 		}
 		else
 		{
@@ -304,7 +304,7 @@ class CronJobsForms
 				$cron['task'] = self::$module->l('Module - Hook', 'CronJobsForms');
 			}
 			else
-				$cron['task'] = Tools::safeOutput(urldecode($cron['task']));
+				$cron['task'] = urldecode($cron['task']);
 
 			$cron['hour'] = ($cron['hour'] == -1) ? self::$module->l('Every hour', 'CronJobsForms') : date('H:i', mktime((int)$cron['hour'], 0, 0, 0, 1));
 			$cron['day'] = ($cron['day'] == -1) ? self::$module->l('Every day', 'CronJobsForms') : (int)$cron['day'];
