@@ -353,7 +353,7 @@ class CronJobsForms
 		$data = array(array('id' => '-1', 'name' => self::$module->l('Every day of the week', 'CronJobsForms')));
 
 		for ($day = 1; $day <= 7; $day += 1)
-			$data[] = array('id' => $day, 'name' => self::$module->l(date('l', mktime(0, 0, 0, 0, $day))));
+			$data[] = array('id' => $day, 'name' => self::$module->l(date('l', strtotime('Sunday +' . $day . ' days'))));
 
 		return $data;
 	}
