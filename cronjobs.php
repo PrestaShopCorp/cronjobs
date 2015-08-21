@@ -45,7 +45,7 @@ class CronJobs extends Module
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.3.1';
+		$this->version = '1.3.2';
 		$this->module_key = '';
 
 		$this->controllers = array('callback');
