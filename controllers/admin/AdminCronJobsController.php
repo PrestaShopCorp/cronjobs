@@ -63,7 +63,7 @@ class AdminCronJobsController extends ModuleAdminController
 
 				if ($module == false)
 				{
-					Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.$this->name.' WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'');
+					Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.$this->module->name.' WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'');
 					break;
 				}
 				elseif ($this->shouldBeExecuted($cron) == true)
@@ -100,7 +100,7 @@ class AdminCronJobsController extends ModuleAdminController
 		$hour = ($cron['hour'] == -1) ? date('H') : $cron['hour'];
 		$day = ($cron['day'] == -1) ? date('d') : $cron['day'];
 		$month = ($cron['month'] == -1) ? date('m') : $cron['month'];
-		$day_of_week = ($cron['day_of_week'] == -1) ? date('D') : date('D', strtotime('Sunday +'.($cron['day_of_week'] - 1).' days'));
+		$day_of_week = ($cron['day_of_week'] == -1) ? date('D') : date('D', strtotime('Sunday +' . $cron['day_of_week'] . ' days'));
 
 		$day = date('Y').'-'.str_pad($month, 2, '0', STR_PAD_LEFT).'-'.str_pad($day, 2, '0', STR_PAD_LEFT);
 		$execution = $day_of_week.' '.$day.' '.str_pad($hour, 2, '0', STR_PAD_LEFT);
