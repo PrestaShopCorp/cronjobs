@@ -45,7 +45,7 @@ class CronJobs extends Module
 	{
 		$this->name = 'cronjobs';
 		$this->tab = 'administration';
-		$this->version = '1.3.2';
+		$this->version = '1.3.3';
 		$this->module_key = '';
 
 		$this->controllers = array('callback');
@@ -106,8 +106,12 @@ class CronJobs extends Module
 			Configuration::updateValue('CRONJOBS_MODULE_VERSION', $this->version);
 			Configuration::updateValue('CRONJOBS_ADMIN_DIR', Tools::encrypt($this->getAdminDir()));
 
+
 			if (Configuration::get('CRONJOBS_MODE') == 'webservice')
+            {
+                $this->updateWebservice(true);
 				return $this->enableWebservice();
+            }
 			return $this->disableWebservice();
 		}
 	}
