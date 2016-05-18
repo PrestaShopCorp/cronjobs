@@ -370,7 +370,7 @@ class CronJobs extends Module
 		if (isset($_SERVER['REMOTE_ADDR']) === false)
 			return true;
 
-		return in_array(Tools::getRemoteAddr(), array('127.0.0.1', '::1'));
+		return in_array(Tools::getRemoteAddr(), array('127.0.0.1', '::1')) || preg_match('/^172\.16\.|^192\.168\.|^10\.|^127\.|^localhost|\.local$/', Configuration::get('PS_SHOP_DOMAIN'));
 	}
 
 	protected function renderForm($form, $form_values, $action, $cancel = false, $back_url = false, $update = false)
@@ -651,6 +651,10 @@ class CronJobs extends Module
 
 	protected function updateWebservice($use_webservice)
 	{
+		if ($this->isLocalEnvironment() == true) {
+			return true;
+		}
+
 		$link = new Link();
 		$admin_folder = $this->getAdminDir();
 		$path = Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.$admin_folder;
@@ -681,8 +685,6 @@ class CronJobs extends Module
 			return true;
 		elseif (((Tools::isSubmit('install') == false) || (Tools::isSubmit('reset') == false)) && ((bool)$result == false))
 			return $this->setErrorMessage('An error occurred while trying to contact PrestaShop\'s cron tasks webservice.');
-		elseif ($this->isLocalEnvironment() == true)
-			return true;
 
 		if ((bool)$use_webservice == true)
 			return $this->setSuccessMessage('Your cron tasks have been successfully added to PrestaShop\'s cron tasks webservice.');
