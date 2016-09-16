@@ -325,7 +325,8 @@ class CronJobs extends Module
 		{
 			$query = 'INSERT INTO '._DB_PREFIX_.'cronjobs
 				(`description`, `task`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `one_shot`, `active`, `id_shop`, `id_shop_group`)
-				VALUES (\''.$description.'\', \''.urlencode($task).'\', \'0\', \''.CronJobs::EACH.'\', \''.CronJobs::EACH.'\', \''.CronJobs::EACH.'\',
+				VALUES (\''. Db::getInstance()->escape($description) .'\', \'' .
+                urlencode($task) . '\', \'0\', \''.CronJobs::EACH.'\', \''.CronJobs::EACH.'\', \''.CronJobs::EACH.'\',
 					NULL, TRUE, TRUE, '.$id_shop.', '.$id_shop_group.')';
 
 			return Db::getInstance()->execute($query);
@@ -347,7 +348,8 @@ class CronJobs extends Module
 			{
 				$query = 'INSERT INTO '._DB_PREFIX_.'cronjobs
 					(`description`, `task`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `one_shot`, `active`, `id_shop`, `id_shop_group`)
-					VALUES (\''.$description.'\', \''.urlencode($task).'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\',
+					VALUES (\''.  Db::getInstance()->escape($description) .'\', \'' .
+                    urlencode($task)  . '\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\',
 						NULL, TRUE, TRUE, '.$id_shop.', '.$id_shop_group.')';
 
 				return Db::getInstance()->execute($query);
@@ -447,7 +449,7 @@ class CronJobs extends Module
 	{
 		if ($this->isNewJobValid() == true)
 		{
-			$description = Tools::getValue('description');
+			$description = Db::getInstance()->escape(Tools::getValue('description'));
 			$task = urlencode(Tools::getValue('task'));
 			$hour = (int)Tools::getValue('hour');
 			$day = (int)Tools::getValue('day');
@@ -483,7 +485,7 @@ class CronJobs extends Module
 		if (Tools::isSubmit('id_cronjob') == false)
 			return false;
 
-		$description = Tools::getValue('description');
+		$description = Db::getInstance()->escape(Tools::getValue('description'));
 		$task = urlencode(Tools::getValue('task'));
 		$hour = (int)Tools::getValue('hour');
 		$day = (int)Tools::getValue('day');
