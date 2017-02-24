@@ -193,9 +193,14 @@ class CronJobsForms
     {
         $token = Configuration::get('CRONJOBS_EXECUTION_TOKEN', null, 0, 0);
         $admin_folder = str_replace(_PS_ROOT_DIR_.'/', null, basename(_PS_ADMIN_DIR_));
-        $path = Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.$admin_folder.'/';
-        $curl_url = $path.Context::getContext()->link->getAdminLink('AdminCronJobs', false);
-        $curl_url .= '&token='.$token;
+        if (version_compare(_PS_VERSION_, '1.7', '<') == true) {
+            $path = Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.$admin_folder.'/';
+            $curl_url = $path.Context::getContext()->link->getAdminLink('AdminCronJobs', false);
+            $curl_url .= '&token='.$token;
+        } else {
+            $curl_url = Context::getContext()->link->getAdminLink('AdminCronJobs', false);
+            $curl_url .= '&token='.$token;
+        }
 
         return array(
             'cron_mode' => Configuration::get('CRONJOBS_MODE'),

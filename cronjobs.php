@@ -665,8 +665,12 @@ class CronJobs extends Module
 
         $link = new Link();
         $admin_folder = $this->getAdminDir();
-        $path = Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.$admin_folder;
-        $cron_url = $path.'/'.$link->getAdminLink('AdminCronJobs', false);
+        if (version_compare(_PS_VERSION_, '1.7', '<') == true) {
+            $path = Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.$admin_folder;
+            $cron_url = $path.'/'.$link->getAdminLink('AdminCronJobs', false);
+        } else {
+            $cron_url = $link->getAdminLink('AdminCronJobs', false);
+        }
 
         $webservice_id = Configuration::get('CRONJOBS_WEBSERVICE_ID') ? '/'.Configuration::get('CRONJOBS_WEBSERVICE_ID') : null;
 
