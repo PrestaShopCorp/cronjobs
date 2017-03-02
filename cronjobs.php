@@ -131,7 +131,7 @@ class CronJobs extends Module
     public function installDb()
     {
         return Db::getInstance()->execute(
-            'CREATE TABLE IF NOT EXISTS '._DB_PREFIX_.$this->name.' (
+            'CREATE TABLE IF NOT EXISTS '._DB_PREFIX_.bqSQL($this->name).' (
             `id_cronjob` INTEGER(10) NOT NULL AUTO_INCREMENT,
             `id_module` INTEGER(10) DEFAULT NULL,
             `description` TEXT DEFAULT NULL,
@@ -153,7 +153,7 @@ class CronJobs extends Module
 
     public function uninstallDb()
     {
-        return Db::getInstance()->execute('DROP TABLE IF EXISTS '._DB_PREFIX_.$this->name);
+        return Db::getInstance()->execute('DROP TABLE IF EXISTS '._DB_PREFIX_.bqSQL($this->name));
     }
 
     public function installTab()
@@ -454,7 +454,7 @@ class CronJobs extends Module
             $month = (int)Tools::getValue('month');
             $day_of_week = (int)Tools::getValue('day_of_week');
 
-            $result = Db::getInstance()->getRow('SELECT id_cronjob FROM '._DB_PREFIX_.$this->name.'
+            $result = Db::getInstance()->getRow('SELECT id_cronjob FROM '._DB_PREFIX_.bqSQL($this->name).'
                 WHERE `task` = \''.$task.'\' AND `hour` = \''.$hour.'\' AND `day` = \''.$day.'\'
                 AND `month` = \''.$month.'\' AND `day_of_week` = \''.$day_of_week.'\'');
 
@@ -462,7 +462,7 @@ class CronJobs extends Module
                 $id_shop = (int)Context::getContext()->shop->id;
                 $id_shop_group = (int)Context::getContext()->shop->id_shop_group;
 
-                $query = 'INSERT INTO '._DB_PREFIX_.$this->name.'
+                $query = 'INSERT INTO '._DB_PREFIX_.bqSQL($this->name).'
                     (`description`, `task`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `active`, `id_shop`, `id_shop_group`)
                     VALUES (\''.$description.'\', \''.$task.'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\', NULL, TRUE, '.$id_shop.', '.$id_shop_group.')';
 
@@ -495,7 +495,7 @@ class CronJobs extends Module
         // $id_shop = (int)Context::getContext()->shop->id;
         // $id_shop_group = (int)Context::getContext()->shop->id_shop_group;
 
-        $query = 'UPDATE '._DB_PREFIX_.$this->name.'
+        $query = 'UPDATE '._DB_PREFIX_.bqSQL($this->name).'
             SET `description` = \''.$description.'\',
                 `task` = \''.$task.'\',
                 `hour` = \''.$hour.'\',
@@ -526,11 +526,11 @@ class CronJobs extends Module
             $module = Module::getInstanceById((int)$cron['id_module']);
 
             if ($module == false) {
-                Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.$this->name.' WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'');
+                Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.bqSQL($this->name).' WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'');
                 break;
             }
 
-            $cronjob = (bool)Db::getInstance()->getValue('SELECT `id_cronjob` FROM `'._DB_PREFIX_.$this->name.'`
+            $cronjob = (bool)Db::getInstance()->getValue('SELECT `id_cronjob` FROM `'._DB_PREFIX_.bqSQL($this->name).'`
                 WHERE `id_module` = \''.$id_module.'\' AND `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
 
             if ($cronjob == false) {
@@ -549,7 +549,7 @@ class CronJobs extends Module
         // $id_shop = (int)Context::getContext()->shop->id;
         // $id_shop_group = (int)Context::getContext()->shop->id_shop_group;
 
-        Db::getInstance()->execute('UPDATE '._DB_PREFIX_.$this->name.'
+        Db::getInstance()->execute('UPDATE '._DB_PREFIX_.bqSQL($this->name).'
             SET `one_shot` = IF (`one_shot`, 0, 1) WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
 
         Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', false)
@@ -567,7 +567,7 @@ class CronJobs extends Module
         // $id_shop = (int)Context::getContext()->shop->id;
         // $id_shop_group = (int)Context::getContext()->shop->id_shop_group;
 
-        Db::getInstance()->execute('UPDATE '._DB_PREFIX_.$this->name.'
+        Db::getInstance()->execute('UPDATE '._DB_PREFIX_.bqSQL($this->name).'
             SET `active` = IF (`active`, 0, 1) WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
 
         Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', false)
@@ -709,12 +709,12 @@ class CronJobs extends Module
     protected function postProcessDeleteCronJob($id_cronjob)
     {
         $id_cronjob = Tools::getValue('id_cronjob');
-        $id_module = Db::getInstance()->getValue('SELECT `id_module` FROM '._DB_PREFIX_.$this->name.' WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
+        $id_module = Db::getInstance()->getValue('SELECT `id_module` FROM '._DB_PREFIX_.bqSQL($this->name).' WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
 
         if ((bool)$id_module == false) {
-            Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.$this->name.' WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
+            Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.bqSQL($this->name).' WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
         } else {
-            Db::getInstance()->execute('UPDATE '._DB_PREFIX_.$this->name.' SET `active` = FALSE WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
+            Db::getInstance()->execute('UPDATE '._DB_PREFIX_.bqSQL($this->name).' SET `active` = FALSE WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
         }
 
         return Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', false)
@@ -731,13 +731,13 @@ class CronJobs extends Module
         if (is_callable(array($module, 'getCronFrequency')) == true) {
             $frequency = $module->getCronFrequency();
 
-            $query = 'INSERT INTO '._DB_PREFIX_.$this->name.'
+            $query = 'INSERT INTO '._DB_PREFIX_.bqSQL($this->name).'
                 (`id_module`, `hour`, `day`, `month`, `day_of_week`, `active`, `id_shop`, `id_shop_group`)
                 VALUES (\''.$id_module.'\', \''.$frequency['hour'].'\', \''.$frequency['day'].'\',
                     \''.$frequency['month'].'\', \''.$frequency['day_of_week'].'\',
                     TRUE, '.$id_shop.', '.$id_shop_group.')';
         } else {
-            $query = 'INSERT INTO '._DB_PREFIX_.$this->name.'
+            $query = 'INSERT INTO '._DB_PREFIX_.bqSQL($this->name).'
                 (`id_module`, `active`, `id_shop`, `id_shop_group`)
                 VALUES ('.$id_module.', FALSE, '.$id_shop.', '.$id_shop_group.')';
         }
@@ -747,6 +747,6 @@ class CronJobs extends Module
 
     protected function unregisterModuleHook($id_module)
     {
-        return Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.$this->name.' WHERE `id_module` = \''.(int)$id_module.'\'');
+        return Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.bqSQL($this->name).' WHERE `id_module` = \''.(int)$id_module.'\'');
     }
 }

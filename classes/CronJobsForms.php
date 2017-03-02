@@ -64,7 +64,7 @@ class CronJobsForms
 
         if (($update == true) && (Tools::isSubmit('id_cronjob'))) {
             $id_cronjob = (int)Tools::getValue('id_cronjob');
-            $id_module = (int)Db::getInstance()->getValue('SELECT `id_module` FROM `'._DB_PREFIX_.self::$module->name.'`
+            $id_module = (int)Db::getInstance()->getValue('SELECT `id_module` FROM `'._DB_PREFIX_.bqSQL(self::$module->name).'`
                 WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'
                     AND `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
 
@@ -252,7 +252,7 @@ class CronJobsForms
         $id_shop_group = (int)Context::getContext()->shop->id_shop_group;
 
         $id_cronjob = (int)Tools::getValue('id_cronjob');
-        $cron = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.self::$module->name.'`
+        $cron = Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.bqSQL(self::$module->name).'`
             WHERE `id_cronjob` = \''.$id_cronjob.'\'
             AND `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
 
@@ -281,14 +281,14 @@ class CronJobsForms
         $id_shop_group = (int)Context::getContext()->shop->id_shop_group;
 
         self::$module->addNewModulesTasks();
-        $crons = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.self::$module->name.'` WHERE `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
+        $crons = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.bqSQL(self::$module->name).'` WHERE `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
 
         foreach ($crons as $key => &$cron) {
             if (empty($cron['id_module']) == false) {
                 $module = Module::getInstanceById((int)$cron['id_module']);
 
                 if ($module == false) {
-                    Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.self::$module->name.' WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'');
+                    Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.bqSQL(self::$module->name).' WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'');
                     unset($crons[$key]);
                     break;
                 }
