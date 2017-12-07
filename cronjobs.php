@@ -47,7 +47,7 @@ class CronJobs extends Module
     {
         $this->name = 'cronjobs';
         $this->tab = 'administration';
-        $this->version = '1.4.0';
+        $this->version = '1.4.1';
         $this->module_key = '';
 
         $this->controllers = array('callback');
@@ -366,11 +366,7 @@ class CronJobs extends Module
 
     protected function isLocalEnvironment()
     {
-        if (isset($_SERVER['REMOTE_ADDR']) === false) {
-            return true;
-        }
-
-        return in_array(Tools::getRemoteAddr(), array('127.0.0.1', '::1')) || preg_match('/^172\.16\.|^192\.168\.|^10\.|^127\.|^localhost|\.local$/', Configuration::get('PS_SHOP_DOMAIN'));
+        return preg_match('/^172\.16\.|^192\.168\.|^10\.|^127\.|^localhost|\.local$/', Configuration::get('PS_SHOP_DOMAIN')) || preg_match('/^172\.16\.|^192\.168\.|^10\.|^127\.|^localhost|\.local$/', gethostbyname(Configuration::get('PS_SHOP_DOMAIN')));
     }
 
     protected function renderForm($form, $form_values, $action, $cancel = false, $back_url = false, $update = false)
