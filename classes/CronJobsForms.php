@@ -282,7 +282,7 @@ class CronJobsForms
         $table_name = _DB_PREFIX_.bqSQL(self::$module->name);
 
         $select_query = sprintf(
-            "SELECT * FROM `%s` WHERE `id_shop` = '%s' AND `id_shop_group` = '%s'",
+            "SELECT * FROM `%s` WHERE `id_shop` = '%d' AND `id_shop_group` = '%d'",
             $table_name,
             $id_shop,
             $id_shop_group

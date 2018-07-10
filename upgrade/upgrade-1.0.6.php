@@ -30,7 +30,8 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_1_0_6($module)
 {
-    $table_name = _DB_PREFIX_ . $module->name;
+    $table_name = _DB_PREFIX_.bqSQL($module->name);
+
 
     $look_for_columns = Db::getInstance()->ExecuteS(sprintf('SHOW COLUMNS FROM `%s` LIKE \'one_shot\'', $table_name));
 
