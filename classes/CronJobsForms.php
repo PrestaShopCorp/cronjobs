@@ -118,8 +118,17 @@ class CronJobsForms
 
         $form[0]['form']['input'][] = array(
             'type' => 'select',
-            'name' => 'hour',
+            'name' => 'minute',
             'label' => self::$module->l('Task frequency', 'CronJobsForms'),
+            'desc' => self::$module->l('At what minute should this task be executed?', 'CronJobsForms'),
+            'options' => array(
+                'query' => self::getMinutesFormOptions(),
+                'id' => 'id', 'name' => 'name'
+            ),
+        );
+        $form[0]['form']['input'][] = array(
+            'type' => 'select',
+            'name' => 'hour',
             'desc' => self::$module->l('At what time should this task be executed?', 'CronJobsForms'),
             'options' => array(
                 'query' => self::getHoursFormOptions(),
@@ -224,6 +233,7 @@ class CronJobsForms
         return array(
             'description' => array('title' => self::$module->l('Task description', 'CronJobsForms'), 'type' => 'text', 'orderby' => false),
             'task' => array('title' => self::$module->l('Target link', 'CronJobsForms'), 'type' => 'text', 'orderby' => false),
+            'minute' => array('title' => self::$module->l('Minute', 'CronJobsForms'), 'type' => 'text', 'orderby' => false),
             'hour' => array('title' => self::$module->l('Hour', 'CronJobsForms'), 'type' => 'text', 'orderby' => false),
             'day' => array('title' => self::$module->l('Day', 'CronJobsForms'), 'type' => 'text', 'orderby' => false),
             'month' => array('title' => self::$module->l('Month', 'CronJobsForms'), 'type' => 'text', 'orderby' => false),
@@ -239,6 +249,7 @@ class CronJobsForms
         return array(
             'description' => Tools::safeOutput(Tools::getValue('description', null)),
             'task' => Tools::safeOutput(Tools::getValue('task', null)),
+            'minute' => (int)Tools::getValue('minute', 0),
             'hour' => (int)Tools::getValue('hour', -1),
             'day' => (int)Tools::getValue('day', -1),
             'month' => (int)Tools::getValue('month', -1),
@@ -268,6 +279,7 @@ class CronJobsForms
         return array(
             'description' => $description,
             'task' => $task,
+            'minute' => (int)Tools::getValue('minute', $cron['minute']),
             'hour' => (int)Tools::getValue('hour', $cron['hour']),
             'day' => (int)Tools::getValue('day', $cron['day']),
             'month' => (int)Tools::getValue('month', $cron['month']),
@@ -302,7 +314,8 @@ class CronJobsForms
                 $cron['task'] = urldecode($cron['task']);
             }
 
-            $cron['hour'] = ($cron['hour'] == -1) ? self::$module->l('Every hour', 'CronJobsForms') : date('H:i', mktime((int)$cron['hour'], 0, 0, 0, 1));
+            $cron['minute'] = ($cron['minute'] == -1) ? self::$module->l('Every minute', 'CronJobsForms') : (int)$cron['minute'];
+            $cron['hour'] = ($cron['hour'] == -1) ? self::$module->l('Every hour', 'CronJobsForms') : (int)$cron['hour'];
             $cron['day'] = ($cron['day'] == -1) ? self::$module->l('Every day', 'CronJobsForms') : (int)$cron['day'];
             $cron['month'] = ($cron['month'] == -1) ? self::$module->l('Every month', 'CronJobsForms') : self::$module->l(date('F', mktime(0, 0, 0, (int)$cron['month'], 1)));
             $cron['day_of_week'] = ($cron['day_of_week'] == -1) ? self::$module->l('Every day of the week', 'CronJobsForms') : self::$module->l(date('l', mktime(0, 0, 0, 0, (int)$cron['day_of_week'])));
@@ -314,12 +327,23 @@ class CronJobsForms
         return $crons;
     }
 
+    protected static function getMinutesFormOptions()
+    {
+        $data = array(array('id' => '-1', 'name' => self::$module->l('Every minute', 'CronJobsForms')));
+
+        for ($minute = 0; $minute < 60; $minute += 1) {
+            $data[] = array('id' => $minute, 'name' => $minute);
+        }
+
+        return $data;
+    }
+
     protected static function getHoursFormOptions()
     {
         $data = array(array('id' => '-1', 'name' => self::$module->l('Every hour', 'CronJobsForms')));
 
         for ($hour = 0; $hour < 24; $hour += 1) {
-            $data[] = array('id' => $hour, 'name' => date('H:i', mktime($hour, 0, 0, 0, 1)));
+            $data[] = array('id' => $hour, 'name' => $hour);
         }
 
         return $data;
