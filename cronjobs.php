@@ -47,7 +47,7 @@ class CronJobs extends Module
     {
         $this->name = 'cronjobs';
         $this->tab = 'administration';
-        $this->version = '1.4.0';
+        $this->version = '1.5.0';
         $this->module_key = '';
 
         $this->controllers = array('callback');
@@ -136,6 +136,7 @@ class CronJobs extends Module
             `id_module` INTEGER(10) DEFAULT NULL,
             `description` TEXT DEFAULT NULL,
             `task` TEXT DEFAULT NULL,
+            `minute` INTEGER DEFAULT \'0\',
             `hour` INTEGER DEFAULT \'-1\',
             `day` INTEGER DEFAULT \'-1\',
             `month` INTEGER DEFAULT \'-1\',
@@ -323,19 +324,21 @@ class CronJobs extends Module
 
         if (count($execution) == 0) {
             $query = 'INSERT INTO '._DB_PREFIX_.'cronjobs
-                (`description`, `task`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `one_shot`, `active`, `id_shop`, `id_shop_group`)
+                (`description`, `task`, `minute`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `one_shot`, `active`, `id_shop`, `id_shop_group`)
                 VALUES (\''. Db::getInstance()->escape($description) .'\', \'' .
-                urlencode($task) . '\', \'0\', \''.CronJobs::EACH.'\', \''.CronJobs::EACH.'\', \''.CronJobs::EACH.'\',
+                urlencode($task) . '\', \'0\', \'0\', \''.CronJobs::EACH.'\', \''.CronJobs::EACH.'\', \''.CronJobs::EACH.'\',
                     NULL, TRUE, TRUE, '.$id_shop.', '.$id_shop_group.')';
 
             return Db::getInstance()->execute($query);
         } else {
             $is_frequency_valid = true;
+            $minute = (int)$execution['minute'];
             $hour = (int)$execution['hour'];
             $day = (int)$execution['day'];
             $month = (int)$execution['month'];
             $day_of_week = (int)$execution['day_of_week'];
 
+            $is_frequency_valid = (($minute >= -1) && ($minute < 60) && $is_frequency_valid);
             $is_frequency_valid = (($hour >= -1) && ($hour < 24) && $is_frequency_valid);
             $is_frequency_valid = (($day >= -1) && ($day <= 31) && $is_frequency_valid);
             $is_frequency_valid = (($month >= -1) && ($month <= 31) && $is_frequency_valid);
@@ -343,9 +346,9 @@ class CronJobs extends Module
 
             if ($is_frequency_valid == true) {
                 $query = 'INSERT INTO '._DB_PREFIX_.'cronjobs
-                    (`description`, `task`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `one_shot`, `active`, `id_shop`, `id_shop_group`)
+                    (`description`, `task`, `minute`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `one_shot`, `active`, `id_shop`, `id_shop_group`)
                     VALUES (\''.  Db::getInstance()->escape($description) .'\', \'' .
-                    urlencode($task)  . '\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\',
+                    urlencode($task)  . '\', \''.$minute.'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\',
                         NULL, TRUE, TRUE, '.$id_shop.', '.$id_shop_group.')';
 
                 return Db::getInstance()->execute($query);
@@ -449,13 +452,14 @@ class CronJobs extends Module
         if ($this->isNewJobValid() == true) {
             $description = Db::getInstance()->escape(Tools::getValue('description'));
             $task = urlencode(Tools::getValue('task'));
+            $minute = (int)Tools::getValue('minute');
             $hour = (int)Tools::getValue('hour');
             $day = (int)Tools::getValue('day');
             $month = (int)Tools::getValue('month');
             $day_of_week = (int)Tools::getValue('day_of_week');
 
             $result = Db::getInstance()->getRow('SELECT id_cronjob FROM '._DB_PREFIX_.bqSQL($this->name).'
-                WHERE `task` = \''.$task.'\' AND `hour` = \''.$hour.'\' AND `day` = \''.$day.'\'
+                WHERE `task` = \''.$task.'\' AND `minute` = \''.$minute.'\' AND `hour` = \''.$hour.'\' AND `day` = \''.$day.'\'
                 AND `month` = \''.$month.'\' AND `day_of_week` = \''.$day_of_week.'\'');
 
             if ($result == false) {
@@ -463,8 +467,8 @@ class CronJobs extends Module
                 $id_shop_group = (int)Context::getContext()->shop->id_shop_group;
 
                 $query = 'INSERT INTO '._DB_PREFIX_.bqSQL($this->name).'
-                    (`description`, `task`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `active`, `id_shop`, `id_shop_group`)
-                    VALUES (\''.$description.'\', \''.$task.'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\', NULL, TRUE, '.$id_shop.', '.$id_shop_group.')';
+                    (`description`, `task`, `minute`, `hour`, `day`, `month`, `day_of_week`, `updated_at`, `active`, `id_shop`, `id_shop_group`)
+                    VALUES (\''.$description.'\', \''.$task.'\', \''.$minute.'\', \''.$hour.'\', \''.$day.'\', \''.$month.'\', \''.$day_of_week.'\', NULL, TRUE, '.$id_shop.', '.$id_shop_group.')';
 
                 if (($result = Db::getInstance()->execute($query)) != false) {
                     return $this->setSuccessMessage('The task has been successfully added.');
@@ -486,6 +490,7 @@ class CronJobs extends Module
 
         $description = Db::getInstance()->escape(Tools::getValue('description'));
         $task = urlencode(Tools::getValue('task'));
+        $minute = (int)Tools::getValue('minute');
         $hour = (int)Tools::getValue('hour');
         $day = (int)Tools::getValue('day');
         $month = (int)Tools::getValue('month');
@@ -498,6 +503,7 @@ class CronJobs extends Module
         $query = 'UPDATE '._DB_PREFIX_.bqSQL($this->name).'
             SET `description` = \''.$description.'\',
                 `task` = \''.$task.'\',
+                `minute` = \''.$minute.'\',
                 `hour` = \''.$hour.'\',
                 `day` = \''.$day.'\',
                 `month` = \''.$month.'\',
@@ -579,6 +585,7 @@ class CronJobs extends Module
     {
         if ((Tools::isSubmit('description') == true) &&
             (Tools::isSubmit('task') == true) &&
+            (Tools::isSubmit('minute') == true) &&
             (Tools::isSubmit('hour') == true) &&
             (Tools::isSubmit('day') == true) &&
             (Tools::isSubmit('month') == true) &&
@@ -587,23 +594,27 @@ class CronJobs extends Module
                 return $this->setErrorMessage('The target link you entered is not valid. It should be an absolute URL, on the same domain as your shop.');
             }
 
+            $minute = Tools::getValue('minute');
             $hour = Tools::getValue('hour');
             $day = Tools::getValue('day');
             $month = Tools::getValue('month');
             $day_of_week = Tools::getValue('day_of_week');
 
-            return $this->isFrequencyValid($hour, $day, $month, $day_of_week);
+            return $this->isFrequencyValid($minute, $hour, $day, $month, $day_of_week);
         }
 
         return false;
     }
 
-    protected function isFrequencyValid($hour, $day, $month, $day_of_week)
+    protected function isFrequencyValid($minute, $hour, $day, $month, $day_of_week)
     {
         $success = true;
 
+        if ((($minute >= -1) && ($minute < 60)) == false) {
+            $success &= $this->setErrorMessage('The value you chose for the minute is not valid. It should be between 00 and 59.');
+        }
         if ((($hour >= -1) && ($hour < 24)) == false) {
-            $success &= $this->setErrorMessage('The value you chose for the hour is not valid. It should be between 00:00 and 23:59.');
+            $success &= $this->setErrorMessage('The value you chose for the hour is not valid. It should be between 00 and 23.');
         }
         if ((($day >= -1) && ($day <= 31)) == false) {
             $success &= $this->setErrorMessage('The value you chose for the day is not valid.');
@@ -732,8 +743,8 @@ class CronJobs extends Module
             $frequency = $module->getCronFrequency();
 
             $query = 'INSERT INTO '._DB_PREFIX_.bqSQL($this->name).'
-                (`id_module`, `hour`, `day`, `month`, `day_of_week`, `active`, `id_shop`, `id_shop_group`)
-                VALUES (\''.$id_module.'\', \''.$frequency['hour'].'\', \''.$frequency['day'].'\',
+                (`id_module`, `minute`, `hour`, `day`, `month`, `day_of_week`, `active`, `id_shop`, `id_shop_group`)
+                VALUES (\''.$id_module.'\', \''.$frequency['minute'].'\', \''.$frequency['hour'].'\', \''.$frequency['day'].'\',
                     \''.$frequency['month'].'\', \''.$frequency['day_of_week'].'\',
                     TRUE, '.$id_shop.', '.$id_shop_group.')';
         } else {
