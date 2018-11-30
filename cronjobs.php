@@ -543,7 +543,7 @@ class CronJobs extends Module
             $id_module = (int)$cron['id_module'];
             $module = Module::getInstanceById((int)$cron['id_module']);
 
-            if ($module == false) {
+            if ($module == false && isset($cron['id_cronjob'])) {
                 Db::getInstance()->execute(sprintf("DELETE FROM '%s' WHERE `id_cronjob` = '%s'", $table_name, (int)$cron['id_cronjob']));
                 break;
             }
