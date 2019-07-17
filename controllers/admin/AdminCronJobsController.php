@@ -65,7 +65,9 @@ class AdminCronJobsController extends ModuleAdminController
                     break;
                 } elseif ($this->shouldBeExecuted($cron) == true) {
                     Hook::exec('actionCronJob', array(), $cron['id_module']);
-                    $query = 'UPDATE '._DB_PREFIX_.bqSQL($this->module->name).' SET `updated_at` = NOW(), `active` = IF (`one_shot` = TRUE, FALSE, `active`) WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'';
+                    $now = date('Y-m-d H:i:s');
+                    $query = 'UPDATE '._DB_PREFIX_.bqSQL($this->module->name).' SET `updated_at` = \''.$now.'\', `active` = IF (`one_shot` = TRUE, FALSE, `active`) WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'';
+                    //$query = 'UPDATE '._DB_PREFIX_.bqSQL($this->module->name).' SET `updated_at` = NOW(), `active` = IF (`one_shot` = TRUE, FALSE, `active`) WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'';
                     Db::getInstance()->execute($query);
                 }
             }
@@ -81,7 +83,9 @@ class AdminCronJobsController extends ModuleAdminController
             foreach ($crons as &$cron) {
                 if ($this->shouldBeExecuted($cron) == true) {
                     Tools::file_get_contents(urldecode($cron['task']), false);
-                    $query = 'UPDATE '._DB_PREFIX_.bqSQL($this->module->name).' SET `updated_at` = NOW(), `active` = IF (`one_shot` = TRUE, FALSE, `active`) WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'';
+                    $now = date('Y-m-d H:i:s');
+                    $query = 'UPDATE '._DB_PREFIX_.bqSQL($this->module->name).' SET `updated_at` = \''.$now.'\', `active` = IF (`one_shot` = TRUE, FALSE, `active`) WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'';
+                    //$query = 'UPDATE '._DB_PREFIX_.bqSQL($this->module->name).' SET `updated_at` = NOW(), `active` = IF (`one_shot` = TRUE, FALSE, `active`) WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'';
                     Db::getInstance()->execute($query);
                 }
             }
