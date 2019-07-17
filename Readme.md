@@ -1,3 +1,5 @@
+# A few fixes and additions for a Prestashop add-on
+
 # Cron tasks manager
 
 ## About
