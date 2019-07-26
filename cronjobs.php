@@ -1,6 +1,6 @@
 <?php
 /**
-* 2007-2016 PrestaShop
+* 2007-2018 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,7 +19,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2016 PrestaShop SA
+*  @copyright 2007-2018 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
@@ -255,7 +255,15 @@ class CronJobs extends Module
             $output = $output.$this->renderForm(CronJobsForms::getJobForm(), CronJobsForms::getNewJobFormValues(), 'submitNewCronJob', true, $back_url);
         } elseif (Tools::isSubmit('updatecronjobs') && Tools::isSubmit('id_cronjob')) {
             $form_structure = CronJobsForms::getJobForm('Update cron task', true);
-            $form = $this->renderForm($form_structure, CronJobsForms::getUpdateJobFormValues(), 'submitUpdateCronJob', true, $back_url, true);
+            $form = $this->renderForm(
+                $form_structure,
+                CronJobsForms::getUpdateJobFormValues(),
+                'submitUpdateCronJob',
+                true,
+                $back_url,
+                true
+            );
+
             $output = $output.$form;
         } elseif (Tools::isSubmit('deletecronjobs') && Tools::isSubmit('id_cronjob')) {
             $this->postProcessDeleteCronJob((int)Tools::getValue('id_cronjob'));
@@ -364,13 +372,22 @@ class CronJobs extends Module
         }
     }
 
+    /**
+     * @return bool
+     */
     protected function isLocalEnvironment()
     {
         if (isset($_SERVER['REMOTE_ADDR']) === false) {
             return true;
         }
 
-        return in_array(Tools::getRemoteAddr(), array('127.0.0.1', '::1')) || preg_match('/^172\.16\.|^192\.168\.|^10\.|^127\.|^localhost|\.local$/', Configuration::get('PS_SHOP_DOMAIN'));
+        $is_a_local_ip = in_array(Tools::getRemoteAddr(), array('127.0.0.1', '::1'));
+        $is_a_local_shop_domain = preg_match(
+            '/^172\.16\.|^192\.168\.|^10\.|^127\.|^localhost|\.local$/',
+            Configuration::get('PS_SHOP_DOMAIN')
+        );
+
+        return ($is_a_local_ip || $is_a_local_shop_domain);
     }
 
     protected function renderForm($form, $form_values, $action, $cancel = false, $back_url = false, $update = false)
@@ -513,6 +530,7 @@ class CronJobs extends Module
     public function addNewModulesTasks()
     {
         $crons = Hook::getHookModuleExecList('actionCronJob');
+        $table_name = _DB_PREFIX_.bqSQL($this->name);
 
         if ($crons == false) {
             return false;
@@ -526,12 +544,20 @@ class CronJobs extends Module
             $module = Module::getInstanceById((int)$cron['id_module']);
 
             if ($module == false) {
-                Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.bqSQL($this->name).' WHERE `id_cronjob` = \''.(int)$cron['id_cronjob'].'\'');
+                Db::getInstance()->execute(sprintf("DELETE FROM '%s' WHERE `id_cronjob` = '%s'", $table_name, (int)$cron['id_cronjob']));
                 break;
             }
 
-            $cronjob = (bool)Db::getInstance()->getValue('SELECT `id_cronjob` FROM `'._DB_PREFIX_.bqSQL($this->name).'`
-                WHERE `id_module` = \''.$id_module.'\' AND `id_shop` = \''.$id_shop.'\' AND `id_shop_group` = \''.$id_shop_group.'\'');
+            $select_query = sprintf(
+                "SELECT `id_cronjob` FROM `%s`
+                WHERE `id_module` = '%s' AND `id_shop` = '%s' AND `id_shop_group` = '%s'",
+                $table_name,
+                $id_module,
+                $id_shop,
+                $id_shop_group
+            );
+
+            $cronjob = (bool)Db::getInstance()->getValue($select_query);
 
             if ($cronjob == false) {
                 $this->registerModuleHook($id_module);
@@ -709,12 +735,27 @@ class CronJobs extends Module
     protected function postProcessDeleteCronJob($id_cronjob)
     {
         $id_cronjob = Tools::getValue('id_cronjob');
-        $id_module = Db::getInstance()->getValue('SELECT `id_module` FROM '._DB_PREFIX_.bqSQL($this->name).' WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
+        $table_name = _DB_PREFIX_.bqSQL($this->name);
+
+        $select_query = sprintf(
+            "SELECT `id_module` FROM `%s` WHERE `id_cronjob` = '%s'",
+            $table_name,
+            (int)$id_cronjob
+        );
+        $id_module = Db::getInstance()->getValue($select_query);
 
         if ((bool)$id_module == false) {
-            Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.bqSQL($this->name).' WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
+            Db::getInstance()->execute(sprintf(
+                "DELETE FROM `%s` WHERE `id_cronjob` = '%s'",
+                $table_name,
+                (int)$id_cronjob
+            ));
         } else {
-            Db::getInstance()->execute('UPDATE '._DB_PREFIX_.bqSQL($this->name).' SET `active` = FALSE WHERE `id_cronjob` = \''.(int)$id_cronjob.'\'');
+            Db::getInstance()->execute(sprintf(
+                "UPDATE `%s` SET `active` = FALSE WHERE `id_cronjob` = '%s'",
+                $table_name,
+                (int)$id_cronjob
+            ));
         }
 
         return Tools::redirectAdmin($this->context->link->getAdminLink('AdminModules', false)
@@ -747,6 +788,12 @@ class CronJobs extends Module
 
     protected function unregisterModuleHook($id_module)
     {
-        return Db::getInstance()->execute('DELETE FROM '._DB_PREFIX_.bqSQL($this->name).' WHERE `id_module` = \''.(int)$id_module.'\'');
+        $table_name = _DB_PREFIX_.bqSQL($this->name);
+
+        return Db::getInstance()->execute(sprintf(
+            "DELETE FROM `%s` WHERE `id_module` = '%s'",
+            $table_name,
+            (int)$id_module
+        ));
     }
 }
