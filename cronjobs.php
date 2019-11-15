@@ -64,11 +64,11 @@ class CronJobs extends Module
             $this->init();
         }
 
-        $this->displayName = $this->l('Cron tasks manager');
-        $this->description = $this->l('Manage all your automated web tasks from a single interface.');
+        $this->displayName = $this->trans('Cron tasks manager', array(), 'Modules.Cronjobs.Admin');
+        $this->description = $this->trans('Focus on your business, don\'t lose time working on minor tasks: automate it!', array(), 'Modules.Cronjobs.Admin');
 
         if (function_exists('curl_init') == false) {
-            $this->warning = $this->l('To be able to use this module, please activate cURL (PHP extension).');
+            $this->warning = $this->trans('To be able to use this module, please activate cURL (PHP extension).', array(), 'Modules.Cronjobs.Admin');
         }
     }
 
@@ -426,7 +426,7 @@ class CronJobs extends Module
     {
         $helper = new HelperList();
 
-        $helper->title = $this->l('Cron tasks');
+        $helper->title = $this->trans('Cron tasks', array(), 'Modules.Cronjobs.Admin');
         $helper->table = $this->name;
         $helper->no_link = true;
         $helper->shopLinkType = '';
@@ -441,7 +441,7 @@ class CronJobs extends Module
             'href' => $this->context->link->getAdminLink('AdminModules', false)
             .'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name
             .'&newcronjobs=1&token='.Tools::getAdminTokenLite('AdminModules'),
-            'desc' => $this->l('Add new task')
+            'desc' => $this->trans('Add new task', array(), 'Modules.Cronjobs.Admin')
         );
 
         $helper->token = Tools::getAdminTokenLite('AdminModules');
