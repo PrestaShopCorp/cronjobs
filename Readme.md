@@ -2,7 +2,7 @@
 
 ## About
 
-Manage all your automated web tasks from a single interface.
+Focus on your business and do not lose time working on minor tasks: automate it!
 
 ## Contributing
 
