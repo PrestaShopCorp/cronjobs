@@ -28,10 +28,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-if (defined('_PS_ADMIN_DIR_') === false) {
-    define('_PS_ADMIN_DIR_', _PS_ROOT_DIR_.'/admin/');
-}
-
 require_once(dirname(__FILE__).'/classes/CronJobsForms.php');
 
 class CronJobs extends Module
@@ -96,7 +92,11 @@ class CronJobs extends Module
 
     protected function getAdminDir()
     {
-        return basename(_PS_ADMIN_DIR_);
+        $adminDir = _PS_ROOT_DIR_.'/admin/';
+        if (defined('_PS_ADMIN_DIR_') === true) {
+            $adminDir = _PS_ADMIN_DIR_;
+        }
+        return basename($adminDir);
     }
 
     protected function init()
